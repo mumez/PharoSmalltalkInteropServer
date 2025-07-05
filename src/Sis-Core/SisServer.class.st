@@ -24,12 +24,21 @@ SisServer >> createTeapot [
 		  POST: '/eval/' -> [ :req | self handleEval: req ];
 		  GET: '/list-packages' -> [ :req | self handleListPackages: req ];
 		  GET: '/list-classes' -> [ :req | self handleListClasses: req ];
-		  GET: '/get-package-source' -> [ :req | self handleGetPackageSource: req ];
-		  GET: '/get-class-source' -> [ :req | self handleGetClassSource: req ];
-		  GET: '/get-method-source' -> [ :req | self handleGetMethodSource: req ];
-		  GET: '/get-trait-method-source' -> [ :req | self handleGetTraitMethodSource: req ];
-		  GET: '/get-class-comment' -> [ :req | self handleGetClassComment: req ];
-		  GET: '/search-elements' -> [ :req | self handleSearchElements: req ];
+		  GET: '/list-extended-classes'
+			  -> [ :req | self handleListExtendedClasses: req ];
+		  GET: '/list-methods' -> [ :req | self handleListMethods: req ];
+		  GET:
+			  '/get-class-source' -> [ :req | self handleGetClassSource: req ];
+		  GET:
+			  '/get-method-source'
+			  -> [ :req | self handleGetMethodSource: req ];
+		  GET: '/get-trait-method-source'
+			  -> [ :req | self handleGetTraitMethodSource: req ];
+		  GET:
+			  '/get-class-comment'
+			  -> [ :req | self handleGetClassComment: req ];
+		  GET:
+			  '/search-elements' -> [ :req | self handleSearchElements: req ];
 		  GET: '/export-package' -> [ :req | self handleExportPackage: req ];
 		  GET: '/import-package' -> [ :req | self handleImportPackage: req ];
 		  GET: '/run-test' -> [ :req | self handleRunTest: req ]
@@ -53,47 +62,46 @@ SisServer >> handleEval: request [
 ]
 
 { #category : 'handling' }
-SisServer >> handleListClasses: request [
+SisServer >> handleExportPackage: request [
 	^ self returnResultDo: [
-			  | packageName |
-			  packageName := request at: #package_name.
-			  ((self packageOrganizer packageNamed: packageName) classes
-				   collect: [ :each | each name ]) sorted ]
-]
-
-{ #category : 'handling' }
-SisServer >> handleListPackages: request [
-	^ self returnResultDo: [
-		  (Smalltalk packages collect: [ :each | each name ]) sorted ]
-]
-
-{ #category : 'handling' }
-SisServer >> handleGetPackageSource: request [
-	^ self returnResultDo: [
-		  | packageName package |
+		  | packageName outputPath package |
 		  packageName := request at: #package_name.
+		  outputPath := request at: #output_path.
 		  package := self packageOrganizer packageNamed: packageName.
-		  package mcPackage snapshot definitions collect: [ :each | each source ] ]
+		 package inspect.
+		  'Package exported successfully' ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleGetClassComment: request [
+	^ self returnResultDo: [
+		  | className class |
+		  className := request at: #class_name.
+		  class := Smalltalk globals at: className asSymbol.
+		  class comment ]
 ]
 
 { #category : 'handling' }
 SisServer >> handleGetClassSource: request [
 	^ self returnResultDo: [
-		  | className class |
-		  className := request at: #class_name.
-		  class := Smalltalk globals at: className asSymbol.
-		  class definitionForNautilus ]
+			  | className targetClass |
+			  className := request at: #class_name.
+			  targetClass := Smalltalk globals at: className asSymbol.
+			  TonelWriter sourceCodeOf: targetClass ]
 ]
 
 { #category : 'handling' }
 SisServer >> handleGetMethodSource: request [
+
 	^ self returnResultDo: [
-		  | className methodName class method |
-		  className := request at: #class_name.
-		  methodName := request at: #method_name.
-		  class := Smalltalk globals at: className asSymbol.
-		  method := class methodNamed: methodName asSymbol.
-		  method sourceCode ]
+			  | tokens isClassSide className methodName targetClass |
+			  tokens := (request at: #class_name) findTokens: ' '.
+			  isClassSide := tokens size = 2.
+			  className := tokens first.
+			  methodName := request at: #method_name.
+			  targetClass := Smalltalk globals at: className asSymbol.
+			  isClassSide ifTrue: [ targetClass := targetClass class ].
+			  targetClass sourceCodeAt: methodName asSymbol ]
 ]
 
 { #category : 'handling' }
@@ -108,12 +116,57 @@ SisServer >> handleGetTraitMethodSource: request [
 ]
 
 { #category : 'handling' }
-SisServer >> handleGetClassComment: request [
+SisServer >> handleImportPackage: request [
 	^ self returnResultDo: [
-		  | className class |
-		  className := request at: #class_name.
-		  class := Smalltalk globals at: className asSymbol.
-		  class comment ]
+		  | sourcePath |
+		  sourcePath := request at: #source_path.
+		 (sourcePath asFileReference) inspect.
+		  'Package imported successfully' ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleListClasses: request [
+	^ self returnResultDo: [
+			  | packageName |
+			  packageName := request at: #package_name.
+			  ((self packageOrganizer packageNamed: packageName)
+				  classes collect: [ :each | each name ]) sorted ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleListExtendedClasses: request [
+	^ self returnResultDo: [
+			  | packageName |
+			  packageName := request at: #package_name.
+			  (self packageOrganizer packageNamed: packageName)
+				  extendedClassNames sorted ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleListMethods: request [
+	^ self returnResultDo: [
+			  | packageName |
+			  packageName := request at: #package_name.
+			(self packageOrganizer packageNamed: packageName) inspect.
+			  ((self packageOrganizer packageNamed: packageName)
+				  methods collect: [:each  | each printString ]) sorted ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleListPackages: request [
+	^ self returnResultDo: [
+		  (Smalltalk packages collect: [ :each | each name ]) sorted ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleRunTest: request [
+	^ self returnResultDo: [
+		  | testName testClass testSelector result |
+		  testName := request at: #test_name.
+		  testClass := Smalltalk globals at: (testName copyUpTo: $>) asSymbol.
+		  testSelector := (testName copyAfter: $>) asSymbol.
+		  result := testClass new runCase: testSelector.
+		  result ]
 ]
 
 { #category : 'handling' }
@@ -142,42 +195,6 @@ SisServer >> handleSearchElements: request [
 		      thenCollect: [ :method | { 'type' -> 'method'. 'class' -> method methodClass name. 'name' -> method selector } asDictionary ]) ].
 		  
 		  results asArray ]
-]
-
-{ #category : 'handling' }
-SisServer >> handleExportPackage: request [
-	^ self returnResultDo: [
-		  | packageName outputPath package |
-		  packageName := request at: #package_name.
-		  outputPath := request at: #output_path.
-		  package := self packageOrganizer packageNamed: packageName.
-		  (MCFileTreeWriter on: package mcPackage snapshot) writeToPath: outputPath.
-		  'Package exported successfully' ]
-]
-
-{ #category : 'handling' }
-SisServer >> handleImportPackage: request [
-	^ self returnResultDo: [
-		  | sourcePath |
-		  sourcePath := request at: #source_path.
-		  (MCFileTreeReader on: sourcePath asFileReference) load.
-		  'Package imported successfully' ]
-]
-
-{ #category : 'handling' }
-SisServer >> handleRunTest: request [
-	^ self returnResultDo: [
-		  | testName testClass testSelector result |
-		  testName := request at: #test_name.
-		  testClass := Smalltalk globals at: (testName copyUpTo: $>) asSymbol.
-		  testSelector := (testName copyAfter: $>) asSymbol.
-		  result := testClass new runCase: testSelector.
-		  result ]
-]
-
-{ #category : 'private' }
-SisServer >> packageOrganizer [
-	^ RPackageOrganizer default
 ]
 
 { #category : 'private' }
