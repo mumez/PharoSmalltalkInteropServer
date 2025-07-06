@@ -32,8 +32,6 @@ SisServer >> createTeapot [
 		  GET:
 			  '/get-method-source'
 			  -> [ :req | self handleGetMethodSource: req ];
-		  GET: '/get-trait-method-source'
-			  -> [ :req | self handleGetTraitMethodSource: req ];
 		  GET:
 			  '/get-class-comment'
 			  -> [ :req | self handleGetClassComment: req ];
@@ -63,13 +61,17 @@ SisServer >> handleEval: request [
 
 { #category : 'handling' }
 SisServer >> handleExportPackage: request [
+
 	^ self returnResultDo: [
-		  | packageName outputPath package |
-		  packageName := request at: #package_name.
-		  outputPath := request at: #output_path.
-		  package := self packageOrganizer packageNamed: packageName.
-		 package inspect.
-		  'Package exported successfully' ]
+			  | packageName outputPath snapshot outputPathRef writer |
+			  packageName := request at: #package_name.
+			  outputPath := request at: #output_path.
+			  snapshot := (MCPackage named: packageName) snapshot.
+			  outputPathRef := outputPath asFileReference.
+			  writer := TonelWriter on: outputPathRef ensureCreateDirectory.
+			  writer writeSnapshot: snapshot.
+			  packageName , ' exported to: '
+			  , outputPathRef absolutePath pathString ]
 ]
 
 { #category : 'handling' }
@@ -102,17 +104,6 @@ SisServer >> handleGetMethodSource: request [
 			  targetClass := Smalltalk globals at: className asSymbol.
 			  isClassSide ifTrue: [ targetClass := targetClass class ].
 			  targetClass sourceCodeAt: methodName asSymbol ]
-]
-
-{ #category : 'handling' }
-SisServer >> handleGetTraitMethodSource: request [
-	^ self returnResultDo: [
-		  | traitName methodName trait method |
-		  traitName := request at: #trait_name.
-		  methodName := request at: #method_name.
-		  trait := Smalltalk globals at: traitName asSymbol.
-		  method := trait methodNamed: methodName asSymbol.
-		  method sourceCode ]
 ]
 
 { #category : 'handling' }
