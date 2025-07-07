@@ -70,8 +70,7 @@ SisServer >> handleExportPackage: request [
 			  outputPathRef := outputPath asFileReference.
 			  writer := TonelWriter on: outputPathRef ensureCreateDirectory.
 			  writer writeSnapshot: snapshot.
-			  packageName , ' exported to: '
-			  , outputPathRef absolutePath pathString ]
+			  packageName , ' exported to: ' , outputPathRef absolutePath pathString ]
 ]
 
 { #category : 'handling' }
@@ -108,11 +107,15 @@ SisServer >> handleGetMethodSource: request [
 
 { #category : 'handling' }
 SisServer >> handleImportPackage: request [
+
 	^ self returnResultDo: [
-		  | sourcePath |
-		  sourcePath := request at: #source_path.
-		 (sourcePath asFileReference) inspect.
-		  'Package imported successfully' ]
+			  | packageName sourcePath reader sourcePathRef |
+			  packageName := request at: #package_name.
+			  sourcePath := request at: #source_path.
+			  sourcePathRef := sourcePath asFileReference.
+			  reader := TonelReader on: sourcePathRef fileName: packageName.
+			  reader loadPackage.
+			  packageName , ' imported from: ' , sourcePathRef absolutePath pathString ]
 ]
 
 { #category : 'handling' }
