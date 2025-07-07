@@ -39,7 +39,9 @@ SisServer >> createTeapot [
 			  '/search-elements' -> [ :req | self handleSearchElements: req ];
 		  GET: '/export-package' -> [ :req | self handleExportPackage: req ];
 		  GET: '/import-package' -> [ :req | self handleImportPackage: req ];
-		  GET: '/run-test' -> [ :req | self handleRunTest: req ]
+		  GET:
+			  '/run-package-test' -> [ :req | self handleRunPackageTest: req ];
+		  GET: '/run-class-test' -> [ :req | self handleRunClassTest: req ]
 ]
 
 { #category : 'defaults' }
@@ -153,14 +155,24 @@ SisServer >> handleListPackages: request [
 ]
 
 { #category : 'handling' }
-SisServer >> handleRunTest: request [
+SisServer >> handleRunClassTest: request [
+
 	^ self returnResultDo: [
-		  | testName testClass testSelector result |
-		  testName := request at: #test_name.
-		  testClass := Smalltalk globals at: (testName copyUpTo: $>) asSymbol.
-		  testSelector := (testName copyAfter: $>) asSymbol.
-		  result := testClass new runCase: testSelector.
-		  result ]
+			  | className testClass suite |
+			  className := request at: #class_name.
+			  testClass := Smalltalk globals at: className asSymbol.
+			  suite := testClass suite.
+			  suite run printString ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleRunPackageTest: request [
+	^ self returnResultDo: [
+			  | packageName suite |
+			  packageName := request at: #package_name.
+			  suite := (self packageOrganizer packageNamed: packageName)
+				           testSuite.
+			  suite run printString ]
 ]
 
 { #category : 'handling' }
