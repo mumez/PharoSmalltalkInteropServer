@@ -37,6 +37,11 @@ SisServer >> createTeapot [
 			  -> [ :req | self handleGetClassComment: req ];
 		  GET:
 			  '/search-elements' -> [ :req | self handleSearchElements: req ];
+		  GET: '/search-classes-like' -> [ :req | self handleSearchClassesLike: req ];
+		  GET: '/search-traits-like' -> [ :req | self handleSearchTraitsLike: req ];
+		  GET: '/search-methods-like' -> [ :req | self handleSearchMethodsLike: req ];
+		  GET: '/search-references' -> [ :req | self handleSearchReferences: req ];
+		  GET: '/search-implementers' -> [ :req | self handleSearchImplementers: req ];
 		  GET: '/export-package' -> [ :req | self handleExportPackage: req ];
 		  GET: '/import-package' -> [ :req | self handleImportPackage: req ];
 		  GET:
@@ -199,6 +204,84 @@ SisServer >> handleSearchElements: request [
 		    results addAll: ((Smalltalk allClasses flatCollect: [ :cls | cls methods ]) 
 		      select: [ :method | method selector includesSubstring: query ]
 		      thenCollect: [ :method | { 'type' -> 'method'. 'class' -> method methodClass name. 'name' -> method selector } asDictionary ]) ].
+		  
+		  results asArray ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleSearchClassesLike: request [
+	^ self returnResultDo: [
+		  | query nav results |
+		  query := request at: #class_name_query.
+		  nav := SystemNavigation default.
+		  results := OrderedCollection new.
+		  
+		  nav allClassNamesStartingWith: query do: [ :className |
+		    results add: { 'name' -> className } asDictionary ].
+		  
+		  results asArray ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleSearchTraitsLike: request [
+	^ self returnResultDo: [
+		  | query results |
+		  query := request at: #traits_name_query.
+		  results := OrderedCollection new.
+		  
+		  Smalltalk allTraits do: [ :trait |
+		    (trait name beginsWith: query) ifTrue: [
+		      results add: { 'name' -> trait name } asDictionary ] ].
+		  
+		  results asArray ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleSearchMethodsLike: request [
+	^ self returnResultDo: [
+		  | query nav results |
+		  query := request at: #method_name_query.
+		  nav := SystemNavigation default.
+		  results := OrderedCollection new.
+		  
+		  nav allSelectorsStartingWith: query do: [ :selector |
+		    results add: { 'name' -> selector } asDictionary ].
+		  
+		  results asArray ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleSearchReferences: request [
+	^ self returnResultDo: [
+		  | symbol nav results |
+		  symbol := request at: #program_symbol.
+		  nav := SystemNavigation default.
+		  results := OrderedCollection new.
+		  
+		  (nav allReferencesTo: symbol asSymbol) do: [ :method |
+		    results add: {
+		      'class' -> method methodClass name.
+		      'method' -> method selector.
+		      'package' -> method package name
+		    } asDictionary ].
+		  
+		  results asArray ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleSearchImplementers: request [
+	^ self returnResultDo: [
+		  | selector nav results |
+		  selector := request at: #selector_symbol.
+		  nav := SystemNavigation default.
+		  results := OrderedCollection new.
+		  
+		  (nav allImplementorsOf: selector asSymbol) do: [ :method |
+		    results add: {
+		      'class' -> method methodClass name.
+		      'method' -> method selector.
+		      'package' -> method package name
+		    } asDictionary ].
 		  
 		  results asArray ]
 ]
