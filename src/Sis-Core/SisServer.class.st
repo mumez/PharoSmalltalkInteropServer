@@ -35,8 +35,6 @@ SisServer >> createTeapot [
 		  GET:
 			  '/get-class-comment'
 			  -> [ :req | self handleGetClassComment: req ];
-		  GET:
-			  '/search-elements' -> [ :req | self handleSearchElements: req ];
 		  GET: '/search-classes-like' -> [ :req | self handleSearchClassesLike: req ];
 		  GET: '/search-traits-like' -> [ :req | self handleSearchTraitsLike: req ];
 		  GET: '/search-methods-like' -> [ :req | self handleSearchMethodsLike: req ];
@@ -181,73 +179,53 @@ SisServer >> handleRunPackageTest: request [
 ]
 
 { #category : 'handling' }
-SisServer >> handleSearchElements: request [
-	^ self returnResultDo: [
-		  | query types results |
-		  query := request at: #query.
-		  types := request at: #types.
-		  results := OrderedCollection new.
-		  
-		  (types includes: 'package') ifTrue: [
-		    results addAll: ((Smalltalk packages select: [ :pkg | pkg name includesSubstring: query ])
-		      collect: [ :pkg | { 'type' -> 'package'. 'name' -> pkg name } asDictionary ]) ].
-		  
-		  (types includes: 'class') ifTrue: [
-		    results addAll: ((Smalltalk allClasses select: [ :cls | cls name includesSubstring: query ])
-		      collect: [ :cls | { 'type' -> 'class'. 'name' -> cls name } asDictionary ]) ].
-		  
-		  (types includes: 'trait') ifTrue: [
-		    results addAll: ((Smalltalk allTraits select: [ :trait | trait name includesSubstring: query ])
-		      collect: [ :trait | { 'type' -> 'trait'. 'name' -> trait name } asDictionary ]) ].
-		  
-		  (types includes: 'method') ifTrue: [
-		    results addAll: ((Smalltalk allClasses flatCollect: [ :cls | cls methods ]) 
-		      select: [ :method | method selector includesSubstring: query ]
-		      thenCollect: [ :method | { 'type' -> 'method'. 'class' -> method methodClass name. 'name' -> method selector } asDictionary ]) ].
-		  
-		  results asArray ]
-]
-
-{ #category : 'handling' }
 SisServer >> handleSearchClassesLike: request [
+
 	^ self returnResultDo: [
-		  | query nav results |
-		  query := request at: #class_name_query.
-		  nav := SystemNavigation default.
-		  results := OrderedCollection new.
-		  
-		  nav allClassNamesStartingWith: query do: [ :className |
-		    results add: { 'name' -> className } asDictionary ].
-		  
-		  results asArray ]
+			  | query nav results |
+			  query := request at: #class_name_query.
+			  nav := SystemNavigation default.
+			  results := OrderedCollection new.
+			  nav
+				  allClassNamesStartingWith: query
+				  do: [ :className |
+				  results add: className ]
+				  caseSensitive: false.
+			  results  ]
 ]
 
 { #category : 'handling' }
-SisServer >> handleSearchTraitsLike: request [
+SisServer >> handleSearchImplementers: request [
+
 	^ self returnResultDo: [
-		  | query results |
-		  query := request at: #traits_name_query.
-		  results := OrderedCollection new.
-		  
-		  Smalltalk allTraits do: [ :trait |
-		    (trait name beginsWith: query) ifTrue: [
-		      results add: { 'name' -> trait name } asDictionary ] ].
-		  
-		  results asArray ]
+			  | selector nav results |
+			  selector := request at: #method_name.
+			  nav := SystemNavigation default.
+			  results := OrderedCollection new.
+
+			  (nav allImplementorsOf: selector asSymbol) do: [ :method |
+					  results add: {
+							  ('class' -> method methodClass name).
+							  ('method' -> method selector).
+							  ('package' -> method package name) } asDictionary ].
+
+			  results asArray ]
 ]
 
 { #category : 'handling' }
 SisServer >> handleSearchMethodsLike: request [
+
 	^ self returnResultDo: [
-		  | query nav results |
-		  query := request at: #method_name_query.
-		  nav := SystemNavigation default.
-		  results := OrderedCollection new.
-		  
-		  nav allSelectorsStartingWith: query do: [ :selector |
-		    results add: { 'name' -> selector } asDictionary ].
-		  
-		  results asArray ]
+			  | query nav results |
+			  query := request at: #method_name_query.
+			  nav := SystemNavigation default.
+			  results := OrderedCollection new.
+
+			  nav
+				  allSelectorsStartingWith: query
+				  do: [ :selector | results add: selector ].
+
+			  results ]
 ]
 
 { #category : 'handling' }
@@ -269,19 +247,15 @@ SisServer >> handleSearchReferences: request [
 ]
 
 { #category : 'handling' }
-SisServer >> handleSearchImplementers: request [
+SisServer >> handleSearchTraitsLike: request [
 	^ self returnResultDo: [
-		  | selector nav results |
-		  selector := request at: #selector_symbol.
-		  nav := SystemNavigation default.
+		  | query results |
+		  query := request at: #traits_name_query.
 		  results := OrderedCollection new.
 		  
-		  (nav allImplementorsOf: selector asSymbol) do: [ :method |
-		    results add: {
-		      'class' -> method methodClass name.
-		      'method' -> method selector.
-		      'package' -> method package name
-		    } asDictionary ].
+		  Smalltalk allTraits do: [ :trait |
+		    (trait name beginsWith: query) ifTrue: [
+		      results add: { 'name' -> trait name } asDictionary ] ].
 		  
 		  results asArray ]
 ]
