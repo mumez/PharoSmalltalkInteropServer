@@ -230,34 +230,33 @@ SisServer >> handleSearchMethodsLike: request [
 
 { #category : 'handling' }
 SisServer >> handleSearchReferences: request [
+
 	^ self returnResultDo: [
-		  | symbol nav results |
-		  symbol := request at: #program_symbol.
-		  nav := SystemNavigation default.
-		  results := OrderedCollection new.
-		  
-		  (nav allReferencesTo: symbol asSymbol) do: [ :method |
-		    results add: {
-		      'class' -> method methodClass name.
-		      'method' -> method selector.
-		      'package' -> method package name
-		    } asDictionary ].
-		  
-		  results asArray ]
+			  | symbol nav results |
+			  symbol := request at: #program_symbol.
+			  nav := SystemNavigation default.
+			  results := OrderedCollection new.
+			  results addAll:
+				  ((nav allReferencesTo: symbol asSymbol) collect: [ :method |
+						   {
+							   ('class' -> method methodClass name).
+							   ('method' -> method selector).
+							   ('package' -> method package name) } asDictionary ]).
+
+			  results ]
 ]
 
 { #category : 'handling' }
 SisServer >> handleSearchTraitsLike: request [
+
 	^ self returnResultDo: [
-		  | query results |
-		  query := request at: #traits_name_query.
-		  results := OrderedCollection new.
-		  
-		  Smalltalk allTraits do: [ :trait |
-		    (trait name beginsWith: query) ifTrue: [
-		      results add: { 'name' -> trait name } asDictionary ] ].
-		  
-		  results asArray ]
+			  | query results |
+			  query := request at: #traits_name_query.
+			  results := (Smalltalk globals allTraits select: [ :trait |
+				              trait name beginsWith: query caseSensitive: false ])
+				             collect: [ :each | each name ].
+
+			  results ]
 ]
 
 { #category : 'private' }
