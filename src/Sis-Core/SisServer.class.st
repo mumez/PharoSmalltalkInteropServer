@@ -35,11 +35,22 @@ SisServer >> createTeapot [
 		  GET:
 			  '/get-class-comment'
 			  -> [ :req | self handleGetClassComment: req ];
-		  GET: '/search-classes-like' -> [ :req | self handleSearchClassesLike: req ];
-		  GET: '/search-traits-like' -> [ :req | self handleSearchTraitsLike: req ];
-		  GET: '/search-methods-like' -> [ :req | self handleSearchMethodsLike: req ];
-		  GET: '/search-references' -> [ :req | self handleSearchReferences: req ];
-		  GET: '/search-implementers' -> [ :req | self handleSearchImplementers: req ];
+		  GET:
+			  '/search-classes-like'
+			  -> [ :req | self handleSearchClassesLike: req ];
+		  GET:
+			  '/search-traits-like'
+			  -> [ :req | self handleSearchTraitsLike: req ];
+		  GET:
+			  '/search-methods-like'
+			  -> [ :req | self handleSearchMethodsLike: req ];
+		  GET:
+			  '/search-references'
+			  -> [ :req | self handleSearchReferences: req ];
+		  GET: '/search-implementers'
+			  -> [ :req | self handleSearchImplementers: req ];
+		  GET: '/search-references-to-class'
+			  -> [ :req | self handleSearchReferencesToClass: req ];
 		  GET: '/export-package' -> [ :req | self handleExportPackage: req ];
 		  GET: '/import-package' -> [ :req | self handleImportPackage: req ];
 		  GET:
@@ -232,18 +243,31 @@ SisServer >> handleSearchMethodsLike: request [
 SisServer >> handleSearchReferences: request [
 
 	^ self returnResultDo: [
-			  | symbol nav results |
+			  | symbol nav |
 			  symbol := request at: #program_symbol.
 			  nav := SystemNavigation default.
-			  results := OrderedCollection new.
-			  results addAll:
-				  ((nav allReferencesTo: symbol asSymbol) collect: [ :method |
-						   {
-							   ('class' -> method methodClass name).
-							   ('method' -> method selector).
-							   ('package' -> method package name) } asDictionary ]).
+			  (nav allReferencesTo: symbol asSymbol) collect: [ :method |
+					  {
+						  ('class' -> method methodClass name).
+						  ('method' -> method selector).
+						  ('package' -> method package name) } asDictionary ] ]
+]
 
-			  results ]
+{ #category : 'handling' }
+SisServer >> handleSearchReferencesToClass: request [
+
+	^ self returnResultDo: [
+			  | className nav targetClass |
+			  className := request at: #class_name.
+			  nav := SystemNavigation default.
+			  targetClass := Smalltalk globals at: className asSymbol.
+
+
+			  (targetClass allCallsOnIn: nav) collect: [ :method |
+					  {
+						  ('class' -> method methodClass name).
+						  ('method' -> method selector).
+						  ('package' -> method package name) } asDictionary ] ]
 ]
 
 { #category : 'handling' }
