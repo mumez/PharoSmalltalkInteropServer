@@ -5,22 +5,79 @@ Class {
 		'teapot',
 		'teapotConfig'
 	],
+	#classInstVars : [
+		'current',
+		'teapotConfig',
+		'inst'
+	],
 	#category : 'Sis-Core',
 	#package : 'Sis-Core'
 }
 
 { #category : 'instance creation' }
-SisServer class >> configure:  assocArray [
+SisServer class >> configure:  settingsDict [
 	| inst |
 	inst := self new.
-	inst teapotConfig: assocArray.
+	inst teapotConfig: settingsDict.
 	^ inst 
+]
+
+{ #category : 'instance creation' }
+SisServer class >> createStarted [
+
+	inst := self configure: self teapotConfig.
+	inst start.
+	^ inst
+]
+
+{ #category : 'accessing' }
+SisServer class >> current [
+
+	^ current ifNil: [ current :=  self createStarted]
+]
+
+{ #category : 'accessing' }
+SisServer class >> current: anObject [
+
+	current := anObject
+]
+
+{ #category : 'defaults' }
+SisServer class >> defaultTeapotConfig [
+
+	^ {
+		  (#defaultOutput -> #json).
+		  (#port -> 8086) } asDictionary
+]
+
+{ #category : 'class initialization' }
+SisServer class >> initialize [
+	SessionManager default registerUserClassNamed: self name.
+	
+	teapotConfig := self defaultTeapotConfig.
+]
+
+{ #category : 'system startup' }
+SisServer class >> startUp: isImageStarting [
+
+	isImageStarting ifFalse: [ ^ self ].
+	
+	current ifNotNil: [ current stop ].
+	current := nil.
+	
+	Smalltalk session
+		addDeferredStartupAction: [ self current ]
+]
+
+{ #category : 'accessing' }
+SisServer class >> teapotConfig [
+	^  teapotConfig
 ]
 
 { #category : 'factory' }
 SisServer >> createTeapot [
 
-	^ (Teapot configure: self teapotConfig)
+	^ (Teapot configure: self teapotConfig associations)
 		  POST: '/eval/' -> [ :req | self handleEval: req ];
 		  GET: '/list-packages' -> [ :req | self handleListPackages: req ];
 		  GET: '/list-classes' -> [ :req | self handleListClasses: req ];
@@ -56,14 +113,6 @@ SisServer >> createTeapot [
 		  GET:
 			  '/run-package-test' -> [ :req | self handleRunPackageTest: req ];
 		  GET: '/run-class-test' -> [ :req | self handleRunClassTest: req ]
-]
-
-{ #category : 'defaults' }
-SisServer >> defaultTeapotConfig [
-
-	^ {
-		  (#defaultOutput -> #json).
-		  (#port -> 8086) }
 ]
 
 { #category : 'handling' }
@@ -321,7 +370,7 @@ SisServer >> teapot: anObject [
 { #category : 'accessing' }
 SisServer >> teapotConfig [
 
-	^ teapotConfig ifNil: [ teapotConfig := self defaultTeapotConfig ]
+	^ teapotConfig ifNil: [ teapotConfig := self class defaultTeapotConfig ]
 ]
 
 { #category : 'accessing' }
