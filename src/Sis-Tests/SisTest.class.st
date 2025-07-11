@@ -58,3 +58,171 @@ SisTest >> testSearchMethodLike [
 	result := resp at: #result.
 	self assertCollection: result   equals: #('testMethodAaa' 'testMethodAab')
 ]
+
+{ #category : 'tests' }
+SisTest >> testListClasses [
+	| url resp result |
+	url := self baseUrl / 'list-classes'.
+	url queryAt: 'package_name' put: 'Sis-Tests'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includes: 'SisTest').
+	self assert: (result includes: 'SisFixtureClassForTest')
+]
+
+{ #category : 'tests' }
+SisTest >> testListExtendedClasses [
+	| url resp result |
+	url := self baseUrl / 'list-extended-classes'.
+	url queryAt: 'package_name' put: 'Sis-Core'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: Array)
+]
+
+{ #category : 'tests' }
+SisTest >> testListMethods [
+	| url resp result |
+	url := self baseUrl / 'list-methods'.
+	url queryAt: 'package_name' put: 'Sis-Tests'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: Array)
+]
+
+{ #category : 'tests' }
+SisTest >> testGetClassSource [
+	| url resp result |
+	url := self baseUrl / 'get-class-source'.
+	url queryAt: 'class_name' put: 'SisFixtureClassForTest'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'SisFixtureClassForTest').
+	self assert: (result includesSubstring: 'testMethodAaa')
+]
+
+{ #category : 'tests' }
+SisTest >> testGetMethodSource [
+	| url resp result |
+	url := self baseUrl / 'get-method-source'.
+	url queryAt: 'class_name' put: 'SisFixtureClassForTest'.
+	url queryAt: 'method_name' put: 'testMethodBbb'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'testMethodBbb').
+	self assert: (result includesSubstring: 'TestSymbolBBB')
+]
+
+{ #category : 'tests' }
+SisTest >> testGetClassComment [
+	| url resp result |
+	url := self baseUrl / 'get-class-comment'.
+	url queryAt: 'class_name' put: 'Object'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: String)
+]
+
+{ #category : 'tests' }
+SisTest >> testSearchClassesLike [
+	| url resp result |
+	url := self baseUrl / 'search-classes-like'.
+	url queryAt: 'class_name_query' put: 'SisFixture'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includes: 'SisFixtureClassForTest')
+]
+
+{ #category : 'tests' }
+SisTest >> testSearchTraitsLike [
+	| url resp result |
+	url := self baseUrl / 'search-traits-like'.
+	url queryAt: 'traits_name_query' put: 'T'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: Array)
+]
+
+{ #category : 'tests' }
+SisTest >> testSearchReferences [
+	| url resp result |
+	url := self baseUrl / 'search-references'.
+	url queryAt: 'program_symbol' put: 'TestSymbolBBB'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: Array).
+	self assert: result size > 0.
+	self assert: ((result first at: 'class') = 'SisFixtureClassForTest').
+	self assert: ((result first at: 'method') = 'testMethodBbb')
+]
+
+{ #category : 'tests' }
+SisTest >> testSearchImplementers [
+	| url resp result |
+	url := self baseUrl / 'search-implementers'.
+	url queryAt: 'method_name' put: 'testMethodAaa'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: Array).
+	self assert: result size > 0.
+	self assert: ((result first at: 'class') = 'SisFixtureClassForTest').
+	self assert: ((result first at: 'method') = 'testMethodAaa')
+]
+
+{ #category : 'tests' }
+SisTest >> testSearchReferencesToClass [
+	| url resp result |
+	url := self baseUrl / 'search-references-to-class'.
+	url queryAt: 'class_name' put: 'SisFixtureClassForTest'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: Array)
+]
+
+{ #category : 'tests' }
+SisTest >> testExportPackage [
+	| url resp result tempDir |
+	tempDir := FileSystem workingDirectory / 'temp_export'.
+	tempDir ensureCreateDirectory.
+	url := self baseUrl / 'export-package'.
+	url queryAt: 'package_name' put: 'Sis-Tests'.
+	url queryAt: 'output_path' put: tempDir absolutePath pathString.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'exported to').
+	tempDir deleteAll
+]
+
+{ #category : 'tests' }
+SisTest >> testRunClassTest [
+	| url resp result |
+	url := self baseUrl / 'run-class-test'.
+	url queryAt: 'class_name' put: 'SisTest'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'run')
+]
+
+{ #category : 'tests' }
+SisTest >> testRunPackageTest [
+	| url resp result |
+	url := self baseUrl / 'run-package-test'.
+	url queryAt: 'package_name' put: 'Sis-Tests'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'run')
+]
