@@ -206,7 +206,6 @@ SisServer >> handleListMethods: request [
 	^ self returnResultDo: [
 			  | packageName |
 			  packageName := request at: #package_name.
-			(self packageOrganizer packageNamed: packageName) inspect.
 			  ((self packageOrganizer packageNamed: packageName)
 				  methods collect: [:each  | each printString ]) sorted ]
 ]
