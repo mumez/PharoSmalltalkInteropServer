@@ -170,9 +170,9 @@ SisTest >> testSearchClassesLike [
 ]
 
 { #category : 'tests' }
-SisTest >> testSearchImplementers [
+SisTest >> testSearchImplementors [
 	| url resp result |
-	url := self baseUrl / 'search-implementers'.
+	url := self baseUrl / 'search-implementors'.
 	url queryAt: 'method_name' put: 'testMethodAaa'.
 	resp := self get: url.
 	self assert: (resp at: #success).

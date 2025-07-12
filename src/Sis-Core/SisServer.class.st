@@ -104,8 +104,8 @@ SisServer >> createTeapot [
 		  GET:
 			  '/search-references'
 			  -> [ :req | self handleSearchReferences: req ];
-		  GET: '/search-implementers'
-			  -> [ :req | self handleSearchImplementers: req ];
+		  GET: '/search-implementors'
+			  -> [ :req | self handleSearchImplementors: req ];
 		  GET: '/search-references-to-class'
 			  -> [ :req | self handleSearchReferencesToClass: req ];
 		  GET: '/export-package' -> [ :req | self handleExportPackage: req ];
@@ -254,7 +254,7 @@ SisServer >> handleSearchClassesLike: request [
 ]
 
 { #category : 'handling' }
-SisServer >> handleSearchImplementers: request [
+SisServer >> handleSearchImplementors: request [
 
 	^ self returnResultDo: [
 			  | selector nav results |
