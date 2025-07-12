@@ -140,22 +140,22 @@ SisTest >> testListPackages [
 SisTest >> testRunClassTest [
 	| url resp result |
 	url := self baseUrl / 'run-class-test'.
-	url queryAt: 'class_name' put: 'SisTest'.
+	url queryAt: 'class_name' put: 'SisDummyTest'.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result includesSubstring: 'run')
+	self assert: (result includesSubstring: '2 ran, 2 passed, ')
 ]
 
 { #category : 'tests' }
 SisTest >> testRunPackageTest [
 	| url resp result |
 	url := self baseUrl / 'run-package-test'.
-	url queryAt: 'package_name' put: 'Sis-Tests'.
+	url queryAt: 'package_name' put: 'Sis-Tests-Dummy'.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result includesSubstring: 'run')
+	self assert: (result includesSubstring: '3 ran, 3 passed, ')
 ]
 
 { #category : 'tests' }
