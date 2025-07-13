@@ -200,7 +200,7 @@ SisTest >> testSearchMethodLike [
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assertCollection: result  equals: #('testMethodAaa' 'testMethodAab')
+	self assertCollection: result  sorted equals: #('testMethodAaa' 'testMethodAab')
 ]
 
 { #category : 'tests' }
