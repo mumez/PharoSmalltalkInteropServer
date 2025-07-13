@@ -16,8 +16,7 @@ A powerful web API server that bridges Pharo Smalltalk environments with externa
 ## Installation
 
 ### Prerequisites
-- Pharo Smalltalk image (tested with Pharo 11+)
-- Internet connection for package loading
+- Pharo Smalltalk image (tested with Pharo 12+)
 
 ### Install via Metacello
 Execute in Pharo Playground:
@@ -121,9 +120,10 @@ SisTest suite run
 ### Project Structure
 ```
 src/
-├── Sis-Core/           # Core server implementation
-├── Sis-Tests/          # Main test suite
-└── Sis-Tests-Dummy/    # Test fixtures
+├── BaselineOfPharoSmalltalkInteropServer/  # Metacello baseline configuration
+├── Sis-Core/                               # Core server implementation
+├── Sis-Tests/                              # Main test suite
+└── Sis-Tests-Dummy/                        # Test fixtures
 ```
 
 ## Dependencies
