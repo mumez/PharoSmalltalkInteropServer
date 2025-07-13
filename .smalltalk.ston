@@ -1,0 +1,13 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'PharoSmalltalkInteropServer',
+      #directory : 'src',
+      #load : [ 'Tests'],
+      #onConflict : #useLoaded,
+      #useLatestMetacello : false,
+      #onWarningLog : true,
+      #platforms : [ #pharo ]
+    }
+  ]
+}
