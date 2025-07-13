@@ -32,8 +32,10 @@ BaselineOfPharoSmalltalkInteropServer >> postload: loader package: packageSpec [
 { #category : 'external projects' }
 BaselineOfPharoSmalltalkInteropServer >> teapot: spec [
 
-	spec baseline: 'Teapot' with: [
-			spec
-				repository: 'https://github.com/zeroflag/Teapot';
-				loads: 'default' ]
+	spec
+		baseline: 'Teapot' with: [
+				spec
+					repository: 'github://zeroflag/Teapot:master/source';
+					loads: #( 'Deployment' ) ];
+		import: 'Teapot'
 ]
