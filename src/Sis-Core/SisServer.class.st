@@ -7,8 +7,7 @@ Class {
 	],
 	#classInstVars : [
 		'current',
-		'teapotConfig',
-		'inst'
+		'teapotConfig'
 	],
 	#category : 'Sis-Core',
 	#package : 'Sis-Core'
@@ -24,7 +23,7 @@ SisServer class >> configure:  settingsDict [
 
 { #category : 'instance creation' }
 SisServer class >> createStarted [
-
+	| inst |
 	inst := self configure: self teapotConfig.
 	inst start.
 	^ inst
