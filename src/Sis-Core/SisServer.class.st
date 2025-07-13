@@ -130,7 +130,7 @@ SisServer >> handleExportPackage: request [
 	^ self returnResultDo: [
 			  | packageName outputPath snapshot outputPathRef writer |
 			  packageName := request at: #package_name.
-			  outputPath := request at: #output_path.
+			  outputPath := request at: #path.
 			  snapshot := (MCPackage named: packageName) snapshot.
 			  outputPathRef := outputPath asFileReference.
 			  writer := TonelWriter on: outputPathRef ensureCreateDirectory.
@@ -176,7 +176,7 @@ SisServer >> handleImportPackage: request [
 	^ self returnResultDo: [
 			  | packageName sourcePath reader sourcePathRef |
 			  packageName := request at: #package_name.
-			  sourcePath := request at: #source_path.
+			  sourcePath := request at: #path.
 			  sourcePathRef := sourcePath asFileReference.
 			  reader := TonelReader on: sourcePathRef fileName: packageName.
 			  reader loadPackage.
@@ -323,7 +323,7 @@ SisServer >> handleSearchTraitsLike: request [
 
 	^ self returnResultDo: [
 			  | query results |
-			  query := request at: #traits_name_query.
+			  query := request at: #trait_name_query.
 			  results := (Smalltalk globals allTraits select: [ :trait |
 				              trait name beginsWith: query caseSensitive: false ])
 				             collect: [ :each | each name ].

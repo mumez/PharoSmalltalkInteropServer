@@ -39,17 +39,26 @@ SisTest >> testEval [
 ]
 
 { #category : 'tests' }
-SisTest >> testExportPackage [
+SisTest >> testExportImportPackage [
 	| url resp result tempDir |
 	tempDir := FileSystem workingDirectory / 'temp_export'.
 	tempDir ensureCreateDirectory.
 	url := self baseUrl / 'export-package'.
-	url queryAt: 'package_name' put: 'Sis-Tests'.
-	url queryAt: 'output_path' put: tempDir absolutePath pathString.
+	url queryAt: 'package_name' put: 'Sis-Tests-Dummy'.
+	url queryAt: 'path' put: tempDir absolutePath pathString.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result includesSubstring: 'exported to').
+	self assert: (result beginsWith: 'Sis-Tests-Dummy exported to: ').
+	
+	url := self baseUrl / 'import-package'.
+	url queryAt: 'package_name' put: 'Sis-Tests-Dummy'.
+	url queryAt: 'path' put: tempDir absolutePath pathString.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result beginsWith: 'Sis-Tests-Dummy imported from: ').
+	
 	tempDir deleteAll
 ]
 
@@ -178,9 +187,9 @@ SisTest >> testSearchImplementors [
 	self assert: (resp at: #success).
 	result := resp at: #result.
 	self assert: (result isKindOf: Array).
-	self assert: result size > 0.
-	self assert: ((result first at: 'class') = 'SisFixtureClassForTest').
-	self assert: ((result first at: 'method') = 'testMethodAaa')
+	self assert: result size equals: 1 .
+	self assert: (result first at: 'class') equals: 'SisFixtureClassForTest'.
+	self assert: (result first at: 'method') equals: 'testMethodAaa'
 ]
 
 { #category : 'tests' }
@@ -191,7 +200,7 @@ SisTest >> testSearchMethodLike [
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assertCollection: result   equals: #('testMethodAaa' 'testMethodAab')
+	self assertCollection: result  equals: #('testMethodAaa' 'testMethodAab')
 ]
 
 { #category : 'tests' }
@@ -203,29 +212,32 @@ SisTest >> testSearchReferences [
 	self assert: (resp at: #success).
 	result := resp at: #result.
 	self assert: (result isKindOf: Array).
-	self assert: result size > 0.
-	self assert: ((result first at: 'class') = 'SisFixtureClassForTest').
-	self assert: ((result first at: 'method') = 'testMethodBbb')
+	self assert: result size equals: 1.
+	self assert: (result first at: 'class') equals: 'SisFixtureClassForTest'.
+	self assert: (result first at: 'method') equals: 'testMethodBbb'
 ]
 
 { #category : 'tests' }
 SisTest >> testSearchReferencesToClass [
 	| url resp result |
 	url := self baseUrl / 'search-references-to-class'.
-	url queryAt: 'class_name' put: 'SisFixtureClassForTest'.
+	url queryAt: 'class_name' put: 'SisTest'.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result isKindOf: Array)
+	self assert: result size equals: 1.
+	self assert: (result first at: 'package') equals: 'Sis-Tests'.
+	self assert: (result first at: 'class') equals: 'SisFixtureClassForTest'.
+	self assert: (result first at: 'method') equals: 'testMethodAaa'
 ]
 
 { #category : 'tests' }
 SisTest >> testSearchTraitsLike [
 	| url resp result |
 	url := self baseUrl / 'search-traits-like'.
-	url queryAt: 'traits_name_query' put: 'T'.
+	url queryAt: 'trait_name_query' put: 'SisFixtureTrait'.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result isKindOf: Array)
+	self assertCollection: result  equals: #('SisFixtureTraitForTest')
 ]

@@ -14,6 +14,7 @@ Class {
 
 { #category : 'actions' }
 SisFixtureClassForTest >> testMethodAaa [
+	^ SisTest
 ]
 
 { #category : 'actions' }
