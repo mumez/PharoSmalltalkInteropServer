@@ -3,7 +3,7 @@ SmalltalkCISpec {
     SCIMetacelloLoadSpec {
       #baseline : 'PharoSmalltalkInteropServer',
       #directory : 'src',
-      #load : [ 'Tests'],
+      #load : ['Tests'],
       #onConflict : #useLoaded,
       #useLatestMetacello : false,
       #onWarningLog : true,
