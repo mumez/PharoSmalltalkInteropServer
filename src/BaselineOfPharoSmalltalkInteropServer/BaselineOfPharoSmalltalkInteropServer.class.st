@@ -15,7 +15,7 @@ BaselineOfPharoSmalltalkInteropServer >> baseline: spec [
 			spec package: 'Sis-Core' with: [ spec requires: #( 'Teapot' ) ].
 			spec
 				package: 'Sis-Tests'
-				with: [ spec requires: #( 'Sis-Tests-Dummy' ) ].
+				with: [ spec requires: #( 'Sis-Core' 'Sis-Tests-Dummy' ) ].
 			spec package: 'Sis-Tests-Dummy'.
 			spec
 				group: 'default' with: #( 'Core' 'Tests' );
