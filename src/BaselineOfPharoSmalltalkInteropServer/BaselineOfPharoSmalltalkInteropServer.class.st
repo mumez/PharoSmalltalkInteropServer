@@ -26,7 +26,7 @@ BaselineOfPharoSmalltalkInteropServer >> baseline: spec [
 { #category : 'baselines' }
 BaselineOfPharoSmalltalkInteropServer >> postload: loader package: packageSpec [
 
-	(Smalltalk globals at: #SisServer) current start
+	Smalltalk globals at: #SisServer ifPresent: [:cls | cls current start]
 ]
 
 { #category : 'external projects' }
