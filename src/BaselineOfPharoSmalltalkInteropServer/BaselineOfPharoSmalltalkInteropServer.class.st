@@ -1,6 +1,6 @@
 Class {
 	#name : 'BaselineOfPharoSmalltalkInteropServer',
-	#superclass : 'Object',
+	#superclass : 'BaselineOf',
 	#category : 'BaselineOfPharoSmalltalkInteropServer',
 	#package : 'BaselineOfPharoSmalltalkInteropServer'
 }
