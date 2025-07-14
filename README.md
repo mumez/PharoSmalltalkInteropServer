@@ -56,55 +56,11 @@ SisServer teapotConfig
 ### Auto-restart Behavior
 After the first start, SisServer automatically restarts when the Pharo image starts up, ensuring continuous availability.
 
-## API Overview
+## API
 
-The server exposes a RESTful API with JSON responses. All endpoints return a standardized response format:
+The server exposes a RESTful API with comprehensive Smalltalk introspection and manipulation capabilities. 
 
-```json
-{
-  "success": true,
-  "result": "..."
-}
-```
-
-Or in case of errors:
-
-```json
-{
-  "success": false,
-  "error": "Error description"
-}
-```
-
-### Key API Categories
-
-- **Code Evaluation**: `POST /eval/`
-- **Package Operations**: `/list-packages`, `/export-package`, `/import-package`
-- **Class Operations**: `/list-classes`, `/get-class-source`, `/get-class-comment`
-- **Method Operations**: `/list-methods`, `/get-method-source`
-- **Search Operations**: `/search-classes-like`, `/search-methods-like`, `/search-references`
-- **Test Operations**: `/run-package-test`, `/run-class-test`
-
-For complete API documentation, see [API.md](API.md).
-
-## Example Usage
-
-### Evaluate Smalltalk Code
-```bash
-curl -X POST http://localhost:8086/eval/ \
-  -H "Content-Type: application/json" \
-  -d '{"code": "3 + 4"}'
-```
-
-### List All Packages
-```bash
-curl http://localhost:8086/list-packages
-```
-
-### Get Class Source
-```bash
-curl "http://localhost:8086/get-class-source?class_name=Object"
-```
+For complete API documentation with detailed examples, see [API.md](API.md).
 
 ## Development
 

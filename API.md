@@ -1,106 +1,130 @@
-# API
+# API Documentation
+
+Complete API specification is available in [OpenAPI 3.0 format](spec/openapi.json).
+
+## Overview
+
+This server provides a RESTful API with JSON responses for Smalltalk code introspection and manipulation. All endpoints return a standardized response format:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "result": "..."
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": "Error description"
+}
+```
+
+## API Categories
+
+### Code Evaluation
+- `POST /eval/` - Execute Smalltalk expressions and return results
+
+### Package Operations
+- `GET /list-packages` - Get list of all packages
+- `GET /export-package` - Export package to specified path
+- `GET /import-package` - Import package from specified path
+
+### Class Operations
+- `GET /list-classes` - Get list of classes in a package
+- `GET /list-extended-classes` - Get list of extended classes in a package
+- `GET /get-class-source` - Get source code of a class
+- `GET /get-class-comment` - Get comment of a class
+
+### Method Operations
+- `GET /list-methods` - Get list of methods in a package
+- `GET /get-method-source` - Get source code of a specific method
+
+### Search Operations
+- `GET /search-classes-like` - Search class names that start with the given query
+- `GET /search-traits-like` - Search trait names that start with the given query
+- `GET /search-methods-like` - Search method selectors that start with the given query
+- `GET /search-references` - Find all references to a given symbol
+- `GET /search-implementors` - Find all implementors of a given method selector
+- `GET /search-references-to-class` - Find all references to a given class
+
+### Test Operations
+- `GET /run-package-test` - Run all tests in a package
+- `GET /run-class-test` - Run all tests in a class
+
+## Usage Examples
+
+### Evaluate Smalltalk Code
+```bash
+curl -X POST http://localhost:8086/eval/ \
+  -H "Content-Type: application/json" \
+  -d '{"code": "5 rem: 3"}'
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": 2
+}
+```
+
+### Search Classes
+```bash
+curl "http://localhost:8086/search-classes-like?class_name_query=SisFixture"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": ["SisFixtureClassForTest"]
+}
+```
+
+### Get Method Source
+```bash
+curl "http://localhost:8086/get-method-source?class_name=SisFixtureClassForTest&method_name=testMethodBbb"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": "testMethodBbb\n\t^ TestSymbolBBB"
+}
+```
+
+
+### Run Package Tests
+```bash
+curl "http://localhost:8086/run-package-test?package_name=Sis-Tests-Dummy"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": "3 ran, 3 passed, 0 failed, 0 errors"
+}
+```
+
+## Error Handling
+
+When an error occurs, the API returns a standardized error response:
 
 ```json
 {
-  "tools": [
-    {
-      "name": "eval",
-      "description": "Evaluate Smalltalk code and return the result",
-      "parameters": { "code": "string" }
-    },
-    {
-      "name": "list_packages",
-      "description": "Get list of all packages"
-    },
-    {
-      "name": "list_classes",
-      "description": "Get list of classes in a package",
-      "parameters": { "package_name": "string" }
-    },
-    {
-      "name": "list_extended_classes",
-      "description": "Get list of extended classes in a package",
-      "parameters": { "package_name": "string" }
-    },
-    {
-      "name": "list_methods",
-      "description": "Get list of methods in a package",
-      "parameters": { "package_name": "string" }
-    },
-    {
-      "name": "get_class_source",
-      "description": "Get source code of a class",
-      "parameters": { "class_name": "string" }
-    },
-    {
-      "name": "get_method_source",
-      "description": "Get source code of a specific method",
-      "parameters": {
-        "class_name": "string",
-        "method_name": "string"
-      }
-    },
-    {
-      "name": "get_class_comment",
-      "description": "Get comment of a class",
-      "parameters": { "class_name": "string" }
-    },
-    {
-      "name": "search_classes_like",
-      "description": "Search class names that start with the given query (case-insensitive)",
-      "parameters": { "class_name_query": "string" }
-    },
-    {
-      "name": "search_traits_like",
-      "description": "Search trait names that start with the given query (case-insensitive)",
-      "parameters": { "trait_name_query": "string" }
-    },
-    {
-      "name": "search_methods_like",
-      "description": "Search method selectors that start with the given query",
-      "parameters": { "method_name_query": "string" }
-    },
-    {
-      "name": "search_references",
-      "description": "Find all references to a given symbol (method/variable/class)",
-      "parameters": { "program_symbol": "string" }
-    },
-    {
-      "name": "search_implementors",
-      "description": "Find all implementors of a given method selector",
-      "parameters": { "method_name": "string" }
-    },
-    {
-      "name": "search_references_to_class",
-      "description": "Find all references to a given class",
-      "parameters": { "class_name": "string" }
-    },
-    {
-      "name": "export_package",
-      "description": "Export package to specified path",
-      "parameters": {
-        "package_name": "string",
-        "path": "string"
-      }
-    },
-    {
-      "name": "import_package",
-      "description": "Import package from specified path",
-      "parameters": {
-        "package_name": "string",
-        "path": "string"
-      }
-    },
-    {
-      "name": "run_package_test",
-      "description": "Run all tests in a package",
-      "parameters": { "package_name": "string" }
-    },
-    {
-      "name": "run_class_test",
-      "description": "Run all tests in a class",
-      "parameters": { "class_name": "string" }
-    }
-  ]
+  "success": false,
+  "error": "Class 'NonExistentClass' not found"
 }
 ```
+
+Common error scenarios:
+- Missing required parameters
+- Invalid class or method names
+- Package not found
+- Compilation errors in evaluated code
+- File system errors during export/import operations

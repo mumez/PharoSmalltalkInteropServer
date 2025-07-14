@@ -1,0 +1,421 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Pharo Smalltalk Interop Server API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8086"
+        }
+    ],
+    "paths": {
+        "/eval/": {
+            "post": {
+                "summary": "Evaluate Smalltalk code and return the result",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "code"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/list-packages": {
+            "get": {
+                "summary": "Get list of all packages",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/list-classes": {
+            "get": {
+                "summary": "Get list of classes in a package",
+                "parameters": [
+                    {
+                        "name": "package_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/list-extended-classes": {
+            "get": {
+                "summary": "Get list of extended classes in a package",
+                "parameters": [
+                    {
+                        "name": "package_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/list-methods": {
+            "get": {
+                "summary": "Get list of methods in a package",
+                "parameters": [
+                    {
+                        "name": "package_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/get-class-source": {
+            "get": {
+                "summary": "Get source code of a class",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/get-method-source": {
+            "get": {
+                "summary": "Get source code of a specific method",
+                "description": "Get source code of a specific method. For class-side methods, append ' class' to the class name (e.g., 'MyClass class').",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Class name. For class-side methods, append ' class' (e.g., 'MyClass class')"
+                    },
+                    {
+                        "name": "method_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/get-class-comment": {
+            "get": {
+                "summary": "Get comment of a class",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/search-classes-like": {
+            "get": {
+                "summary": "Search class names that start with the given query (case-insensitive)",
+                "parameters": [
+                    {
+                        "name": "class_name_query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/search-traits-like": {
+            "get": {
+                "summary": "Search trait names that start with the given query (case-insensitive)",
+                "parameters": [
+                    {
+                        "name": "trait_name_query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/search-methods-like": {
+            "get": {
+                "summary": "Search method selectors that start with the given query",
+                "parameters": [
+                    {
+                        "name": "method_name_query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/search-references": {
+            "get": {
+                "summary": "Find all references to a given symbol (method/variable/class)",
+                "parameters": [
+                    {
+                        "name": "program_symbol",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/search-implementors": {
+            "get": {
+                "summary": "Find all implementors of a given method selector",
+                "parameters": [
+                    {
+                        "name": "method_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/search-references-to-class": {
+            "get": {
+                "summary": "Find all references to a given class",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/export-package": {
+            "get": {
+                "summary": "Export package to specified path",
+                "parameters": [
+                    {
+                        "name": "package_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "path",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/import-package": {
+            "get": {
+                "summary": "Import package from specified path",
+                "parameters": [
+                    {
+                        "name": "package_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "path",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/run-package-test": {
+            "get": {
+                "summary": "Run all tests in a package",
+                "parameters": [
+                    {
+                        "name": "package_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/run-class-test": {
+            "get": {
+                "summary": "Run all tests in a class",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "responses": {
+            "DefaultResponse": {
+                "description": "Standard response",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {},
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
