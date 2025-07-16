@@ -10,7 +10,7 @@
         }
     ],
     "paths": {
-        "/eval/": {
+        "/eval": {
             "post": {
                 "summary": "Evaluate Smalltalk code and return the result",
                 "requestBody": {
@@ -511,7 +511,11 @@
                                                 "type": "string"
                                             }
                                         },
-                                        "required": ["class", "method", "package"]
+                                        "required": [
+                                            "class",
+                                            "method",
+                                            "package"
+                                        ]
                                     }
                                 },
                                 "error": {
@@ -547,7 +551,11 @@
                                                 "type": "string"
                                             }
                                         },
-                                        "required": ["package", "class", "method"]
+                                        "required": [
+                                            "package",
+                                            "class",
+                                            "method"
+                                        ]
                                     }
                                 },
                                 "error": {
