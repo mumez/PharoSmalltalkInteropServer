@@ -43,7 +43,7 @@
                 "summary": "Get list of all packages",
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringArrayResponse"
                     }
                 }
             }
@@ -63,7 +63,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringArrayResponse"
                     }
                 }
             }
@@ -83,7 +83,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringArrayResponse"
                     }
                 }
             }
@@ -103,7 +103,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/MethodNameArrayResponse"
                     }
                 }
             }
@@ -123,7 +123,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringResponse"
                     }
                 }
             }
@@ -153,7 +153,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringResponse"
                     }
                 }
             }
@@ -173,7 +173,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringResponse"
                     }
                 }
             }
@@ -193,7 +193,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringArrayResponse"
                     }
                 }
             }
@@ -213,7 +213,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringArrayResponse"
                     }
                 }
             }
@@ -233,7 +233,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringArrayResponse"
                     }
                 }
             }
@@ -253,7 +253,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/ClassMethodPackageDictArrayResponse"
                     }
                 }
             }
@@ -273,7 +273,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/ClassMethodPackageDictArrayResponse"
                     }
                 }
             }
@@ -293,7 +293,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/ClassMethodPackageDictArrayResponse"
                     }
                 }
             }
@@ -321,7 +321,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringResponse"
                     }
                 }
             }
@@ -349,7 +349,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringResponse"
                     }
                 }
             }
@@ -369,7 +369,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringResponse"
                     }
                 }
             }
@@ -389,7 +389,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/DefaultResponse"
+                        "$ref": "#/components/responses/StringResponse"
                     }
                 }
             }
@@ -408,6 +408,148 @@
                                     "type": "boolean"
                                 },
                                 "result": {},
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "StringResponse": {
+                "description": "Response with string result",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {
+                                    "type": "string"
+                                },
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "StringArrayResponse": {
+                "description": "Response with string array result",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "MethodNameArrayResponse": {
+                "description": "Response with method name array result (ClassName>>#methodName format)",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "pattern": "^[^>]+>>#[^>]+$"
+                                    }
+                                },
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "ClassMethodPackageDictArrayResponse": {
+                "description": "Response with class/method/package dictionary array result",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "class": {
+                                                "type": "string"
+                                            },
+                                            "method": {
+                                                "type": "string"
+                                            },
+                                            "package": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": ["class", "method", "package"]
+                                    }
+                                },
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "PackageClassMethodDictArrayResponse": {
+                "description": "Response with package/class/method dictionary array result",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "package": {
+                                                "type": "string"
+                                            },
+                                            "class": {
+                                                "type": "string"
+                                            },
+                                            "method": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": ["package", "class", "method"]
+                                    }
+                                },
                                 "error": {
                                     "type": "string"
                                 }
