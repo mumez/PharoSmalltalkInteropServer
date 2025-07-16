@@ -77,7 +77,7 @@ SisServer class >> teapotConfig [
 SisServer >> createTeapot [
 
 	^ (Teapot configure: self teapotConfig associations)
-		  POST: '/eval/' -> [ :req | self handleEval: req ];
+		  POST: '/eval' -> [ :req | self handleEval: req ];
 		  GET: '/list-packages' -> [ :req | self handleListPackages: req ];
 		  GET: '/list-classes' -> [ :req | self handleListClasses: req ];
 		  GET: '/list-extended-classes'
