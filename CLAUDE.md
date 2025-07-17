@@ -31,6 +31,7 @@ The server provides extensive Smalltalk introspection and manipulation capabilit
 - Search functionality (classes, traits, methods, references, implementors)
 - Package export/import (Tonel format)
 - Test execution (package and class level)
+- Project installation (`/install-project`) using Metacello
 
 ## Development Commands
 
@@ -88,3 +89,4 @@ The test suite (`SisTest`) validates all API endpoints by:
 - Zinc HTTP Components (HTTP client for tests)
 - SystemNavigation (code introspection)
 - Tonel (package serialization format)
+- Metacello (project installation and management)

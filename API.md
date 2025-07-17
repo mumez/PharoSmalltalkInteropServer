@@ -54,6 +54,9 @@ This server provides a RESTful API with JSON responses for Smalltalk code intros
 - `GET /run-package-test` - Run all tests in a package
 - `GET /run-class-test` - Run all tests in a class
 
+### Project Operations
+- `GET /install-project` - Install a project using Metacello
+
 ## Usage Examples
 
 ### Evaluate Smalltalk Code

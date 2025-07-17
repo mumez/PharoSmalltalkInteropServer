@@ -393,6 +393,43 @@
                     }
                 }
             }
+        },
+        "/install-project": {
+            "get": {
+                "summary": "Install a project using Metacello",
+                "parameters": [
+                    {
+                        "name": "project_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "repository_url",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "load_groups",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Comma-separated list of groups to load"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/StringResponse"
+                    }
+                }
+            }
         }
     },
     "components": {
