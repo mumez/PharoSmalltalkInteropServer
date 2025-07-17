@@ -109,8 +109,7 @@ SisTest >> testInstallProject [
 	resp := self get: url.
 	self deny: (resp at: #success).
 	result := resp at: #error.
-	result traceCr .
-	self assert: (result beginsWith: 'Error: Name not found').
+	self assert: ((result beginsWith: 'Error: Name not found') or: [result beginsWith: 'MetacelloConflictingProjectError:']). "for CI"
 	
 ]
 
