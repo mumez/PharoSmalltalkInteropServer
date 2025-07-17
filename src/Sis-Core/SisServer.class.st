@@ -188,14 +188,16 @@ SisServer >> handleImportPackage: request [
 SisServer >> handleInstallProject: request [
 
 	^ self returnResultDo: [
-			  | baselineName repositoryUrl loadGroups registration |
-			  baselineName := request at: #baseline_name.
+			  | projectName baselineName repositoryUrl loadGroups loadOptions registration |
+			  projectName := request at: #project_name.
+			  baselineName := 'BaselineOf' , projectName.
 			  repositoryUrl := request at: #repository_url.
-			  loadGroups := request at: #load_groups ifAbsent: [ #(  ) ].
+			  loadGroups := request at: #load_groups ifAbsent: [ '' ].
+			  loadOptions := (loadGroups findTokens: ',') collect: #trim.
 			  registration := Metacello new
 				                  baseline: baselineName;
 				                  repository: repositoryUrl;
-				                  load: loadGroups.
+				                  load: loadOptions.
 			  'Installed: ' , registration printString ]
 ]
 
