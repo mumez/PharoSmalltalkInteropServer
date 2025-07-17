@@ -100,6 +100,20 @@ SisTest >> testGetMethodSource [
 ]
 
 { #category : 'tests' }
+SisTest >> testInstallProject [
+	| url resp result |
+	url := self baseUrl / 'install-project'.
+	url queryAt: 'baseline_name' put: 'PharoSmalltalkInteropServer'.
+	url queryAt: 'repository_url' put: 'github://mumez/PharoSmalltalkInteropServer:main/src'''.
+	url queryAt: 'load_groups' put: 'NonExistentGroupA, NonExistentGroupB'.
+	resp := self get: url.
+	self deny: (resp at: #success).
+	result := resp at: #error.
+	result inspect.
+	
+]
+
+{ #category : 'tests' }
 SisTest >> testListClasses [
 	| url resp result |
 	url := self baseUrl / 'list-classes'.

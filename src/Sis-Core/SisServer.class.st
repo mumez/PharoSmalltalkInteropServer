@@ -111,7 +111,9 @@ SisServer >> createTeapot [
 		  GET: '/import-package' -> [ :req | self handleImportPackage: req ];
 		  GET:
 			  '/run-package-test' -> [ :req | self handleRunPackageTest: req ];
-		  GET: '/run-class-test' -> [ :req | self handleRunClassTest: req ]
+		  GET: '/run-class-test' -> [ :req | self handleRunClassTest: req ];
+		  GET:
+			  '/install-project' -> [ :req | self handleInstallProject: req ]
 ]
 
 { #category : 'handling' }
@@ -180,6 +182,21 @@ SisServer >> handleImportPackage: request [
 			  reader := TonelReader on: sourcePathRef fileName: packageName.
 			  reader loadPackage.
 			  packageName , ' imported from: ' , sourcePathRef absolutePath pathString ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleInstallProject: request [
+
+	^ self returnResultDo: [
+			  | baselineName repositoryUrl loadGroups registration |
+			  baselineName := request at: #baseline_name.
+			  repositoryUrl := request at: #repository_url.
+			  loadGroups := request at: #load_groups ifAbsent: [ #(  ) ].
+			  registration := Metacello new
+				                  baseline: baselineName;
+				                  repository: repositoryUrl;
+				                  load: loadGroups.
+			  'Installed: ' , registration printString ]
 ]
 
 { #category : 'handling' }
