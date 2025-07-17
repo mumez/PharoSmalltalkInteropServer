@@ -193,11 +193,11 @@ SisServer >> handleInstallProject: request [
 			  repositoryUrl := request at: #repository_url.
 			  loadGroups := request at: #load_groups ifAbsent: [ '' ].
 			  loadOptions := (loadGroups findTokens: ',') collect: #trim.
-			  registration := Metacello new
+			  [registration := Metacello new
 				                  baseline: projectName;
 				                  repository: repositoryUrl;
 				                  load: loadOptions.
-			  'Installed: ' , registration printString ]
+			  'Installed: ' , registration printString] on: MCMergeOrLoadWarning do:[ :ex | Error signal: ex description] ]
 ]
 
 { #category : 'handling' }
