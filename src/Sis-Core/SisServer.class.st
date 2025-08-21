@@ -181,7 +181,9 @@ SisServer >> handleImportPackage: request [
 			  sourcePathRef := sourcePath asFileReference.
 			  reader := TonelReader on: sourcePathRef fileName: packageName.
 			  reader loadPackage.
-			  packageName , ' imported from: ' , sourcePathRef absolutePath pathString ]
+			  reader snapshot updatePackage: reader package.
+			  packageName , ' imported from: '
+			  , sourcePathRef absolutePath pathString ]
 ]
 
 { #category : 'handling' }
