@@ -243,17 +243,18 @@ SisServer >> handleRunClassTest: request [
 			  className := request at: #class_name.
 			  testClass := Smalltalk globals at: className asSymbol.
 			  suite := testClass suite.
-			  suite run printString ]
+			  self testResultStringFrom: suite run ]
 ]
 
 { #category : 'handling' }
 SisServer >> handleRunPackageTest: request [
+
 	^ self returnResultDo: [
 			  | packageName suite |
 			  packageName := request at: #package_name.
 			  suite := (self packageOrganizer packageNamed: packageName)
 				           testSuite.
-			  suite run printString ]
+			  self testResultStringFrom: suite run ]
 ]
 
 { #category : 'handling' }
@@ -395,4 +396,9 @@ SisServer >> teapotConfig [
 SisServer >> teapotConfig: anObject [
 
 	teapotConfig := anObject
+]
+
+{ #category : 'private' }
+SisServer >> testResultStringFrom: aTestResult [
+	^ String streamContents: [ :aStream | aTestResult fileOutOn: aStream ].
 ]
