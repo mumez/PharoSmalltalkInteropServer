@@ -70,9 +70,29 @@ Metacello new
 - Uses Teapot web framework for HTTP handling
 - JSON request/response format via NeoJSON
 - Error handling wraps all operations in `returnResultDo:` pattern
+- Comprehensive error reporting via `returnError:by:` with stack traces and receiver context
 - SystemNavigation for code introspection
 - TonelWriter/TonelReader for package export/import
 - ZnEasy HTTP client for testing
+
+### Error Response Structure
+
+When errors occur, the server returns detailed error information:
+
+```json
+{
+  "success": false,
+  "error": {
+    "description": "Error type (e.g., 'ZeroDivide')",
+    "stack_trace": "Complete call stack leading to the error",
+    "receiver": {
+      "class": "Class name of the object that received the failing message",
+      "self": "String representation of the receiver object",
+      "variables": {"varName": "varValue"}
+    }
+  }
+}
+```
 
 ## Testing Strategy
 
@@ -81,6 +101,8 @@ The test suite (`SisTest`) validates all API endpoints by:
 - Validating JSON response structure (`success` flag, `result`/`error` fields)
 - Using fixture classes/traits for consistent test data
 - Testing both positive and error cases
+- Comprehensive error response validation including stack traces and receiver information
+- Error case testing with `testEvalWithError` (validates ZeroDivide error handling)
 
 ## Dependencies
 

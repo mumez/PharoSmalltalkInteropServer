@@ -18,7 +18,17 @@ This server provides a RESTful API with JSON responses for Smalltalk code intros
 ```json
 {
   "success": false,
-  "error": "Error description"
+  "error": {
+    "description": "Error description",
+    "stack_trace": "Full stack trace of the error",
+    "receiver": {
+      "class": "Class name where error occurred",
+      "self": "String representation of the receiver object",
+      "variables": {
+        "variableName": "variableValue"
+      }
+    }
+  }
 }
 ```
 
@@ -116,18 +126,36 @@ curl "http://localhost:8086/run-package-test?package_name=Sis-Tests-Dummy"
 
 ## Error Handling
 
-When an error occurs, the API returns a standardized error response:
+When an error occurs, the API returns a standardized error response with detailed error information:
 
 ```json
 {
   "success": false,
-  "error": "Class 'NonExistentClass' not found"
+  "error": {
+    "description": "ZeroDivide",
+    "stack_trace": "SmallInteger>>/\nUndefinedObject>>DoIt\n...",
+    "receiver": {
+      "class": "SmallInteger",
+      "self": "1",
+      "variables": {}
+    }
+  }
 }
 ```
+
+### Error Response Fields
+
+- **description**: Brief error type or message
+- **stack_trace**: Complete stack trace showing the call chain that led to the error
+- **receiver**: Information about the object that received the message causing the error
+  - **class**: The class of the receiver object
+  - **self**: String representation of the receiver object
+  - **variables**: Instance variables of the receiver object with their names and values (when available)
 
 Common error scenarios:
 - Missing required parameters
 - Invalid class or method names
 - Package not found
 - Compilation errors in evaluated code
+- Runtime errors (division by zero, message not understood, etc.)
 - File system errors during export/import operations
