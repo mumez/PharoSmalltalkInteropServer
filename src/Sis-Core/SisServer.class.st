@@ -357,12 +357,35 @@ SisServer >> returnResultDo: aBlock [
 	resultDict := { ('success' -> false) } asDictionary.
 	[ resultDict at: 'result' put: aBlock value ]
 		on: Error
-		do: [ :ex |
-				resultDict at: 'error' put: ex description.
-				^ resultDict ].
+		do: [ :ex | ^ self returnError: ex by: resultDict ].
 	resultDict at: 'success' put: true.
 	^ resultDict
 ]
+
+{ #category : 'private' }
+SisServer >> returnError: anError by: resultDict [
+	| errorInfo signalerContext |
+	errorInfo := Dictionary new.
+	errorInfo at: 'description' put: anError description.
+	signalerContext := anError signalerContext.
+	errorInfo at: 'stack_trace' put: (String streamContents: [:strm | signalerContext debugStack: 500 on: strm]).
+	errorInfo at: 'receiver' put: (self receiverErrorInfoFrom: signalerContext receiver).
+	resultDict at: 'error' put: errorInfo.
+	^ resultDict
+]
+
+{ #category : 'private' }
+SisServer >> receiverErrorInfoFrom: receiverObject [
+	| receiverErrorInfo values |
+	receiverErrorInfo := Dictionary new.
+	receiverErrorInfo at: 'self' put: receiverObject asString.
+	receiverErrorInfo at: 'class' put: receiverObject className.
+	values := Dictionary new.
+	receiverObject class allInstVarNames do: [ :nm | values at: nm put: (receiverObject instVarNamed: nm ) asString].
+	receiverErrorInfo at: 'variables' put: values.
+	^ receiverErrorInfo
+]
+
 
 { #category : 'actions' }
 SisServer >> start [

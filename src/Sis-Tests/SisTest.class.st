@@ -39,6 +39,23 @@ SisTest >> testEval [
 ]
 
 { #category : 'tests' }
+SisTest >> testEvalWithError [
+	| url postData resp errorInfo receiver stackTrace |
+	url := self baseUrl / 'eval'.
+	postData := { ('code' -> '1 / 0') } asDictionary.
+	resp := self post: url dictionary: postData.
+	self deny: (resp at: #success).
+	errorInfo := resp at: #error.
+	self assert: (errorInfo at: #description) equals: 'ZeroDivide'.
+	self assert: (errorInfo includesKey: #stack_trace).
+	stackTrace := errorInfo at: #stack_trace.
+	self assert: (stackTrace includesSubstring: 'SmallInteger>>/').
+	receiver := errorInfo at: #receiver.
+	self assert: (receiver at: #class) equals: 'SmallInteger'.
+	self assert: (receiver at: #self) equals: '1'
+]
+
+{ #category : 'tests' }
 SisTest >> testExportImportPackage [
 	| url resp result tempDir |
 	tempDir := FileSystem workingDirectory / 'temp_export'.
@@ -101,7 +118,7 @@ SisTest >> testGetMethodSource [
 
 { #category : 'tests' }
 SisTest >> testInstallProject [
-	| url resp result |
+	| url resp result errorDesc |
 	url := self baseUrl / 'install-project'.
 	url queryAt: 'project_name' put: 'PharoSmalltalkInteropServer'.
 	url queryAt: 'repository_url' put: 'github://mumez/PharoSmalltalkInteropServer:main/src'.
@@ -109,7 +126,8 @@ SisTest >> testInstallProject [
 	resp := self get: url.
 	self deny: (resp at: #success).
 	result := resp at: #error.
-	self assert: ((result beginsWith: 'Error: Name not found') or: [result beginsWith: 'MetacelloConflictingProjectError:']). "for CI"
+	errorDesc := result at: #description.
+	self assert: ((errorDesc beginsWith: 'Error: Name not found') or: [errorDesc beginsWith: 'MetacelloConflictingProjectError:']). "for CI"
 	
 ]
 
@@ -155,8 +173,8 @@ SisTest >> testListPackages [
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result   includes: 'Sis-Core').
-	self assert: (result   includes: 'Sis-Tests')
+	self assert: (result includes: 'Sis-Core').
+	self assert: (result includes: 'Sis-Tests')
 ]
 
 { #category : 'tests' }
@@ -214,7 +232,7 @@ SisTest >> testSearchMethodLike [
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assertCollection: result  sorted equals: #('testMethodAaa' 'testMethodAab')
+	self assertCollection: result sorted equals: #('testMethodAaa' 'testMethodAab')
 ]
 
 { #category : 'tests' }

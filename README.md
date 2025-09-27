@@ -59,7 +59,11 @@ After the first start, SisServer automatically restarts when the Pharo image sta
 
 ## API
 
-The server exposes a RESTful API with comprehensive Smalltalk introspection and manipulation capabilities. 
+The server exposes a RESTful API with comprehensive Smalltalk introspection and manipulation capabilities. All endpoints return standardized JSON responses with detailed error information including stack traces and receiver context when errors occur.
+
+**Response Format:**
+- **Success**: `{"success": true, "result": "..."}`
+- **Error**: `{"success": false, "error": {"description": "...", "stack_trace": "...", "receiver": {...}}}`
 
 For complete API documentation with detailed examples, see [API.md](API.md).
 
