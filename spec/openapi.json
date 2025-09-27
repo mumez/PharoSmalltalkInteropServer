@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Pharo Smalltalk Interop Server API",
-        "version": "1.0.0"
+        "version": "2.0.0"
     },
     "servers": [
         {
@@ -433,6 +433,44 @@
         }
     },
     "components": {
+        "schemas": {
+            "ErrorDetails": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "description": "Brief error type or message"
+                    },
+                    "stack_trace": {
+                        "type": "string",
+                        "description": "Complete stack trace showing the call chain that led to the error"
+                    },
+                    "receiver": {
+                        "type": "object",
+                        "properties": {
+                            "class": {
+                                "type": "string",
+                                "description": "The class of the receiver object"
+                            },
+                            "self": {
+                                "type": "string",
+                                "description": "String representation of the receiver object"
+                            },
+                            "variables": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                },
+                                "description": "Instance variables of the receiver object with their names and values"
+                            }
+                        },
+                        "required": ["class", "self", "variables"],
+                        "description": "Information about the object that received the message causing the error"
+                    }
+                },
+                "required": ["description", "stack_trace", "receiver"]
+            }
+        },
         "responses": {
             "DefaultResponse": {
                 "description": "Standard response",
@@ -446,7 +484,7 @@
                                 },
                                 "result": {},
                                 "error": {
-                                    "type": "string"
+                                    "$ref": "#/components/schemas/ErrorDetails"
                                 }
                             }
                         }
@@ -467,7 +505,7 @@
                                     "type": "string"
                                 },
                                 "error": {
-                                    "type": "string"
+                                    "$ref": "#/components/schemas/ErrorDetails"
                                 }
                             }
                         }
@@ -491,7 +529,7 @@
                                     }
                                 },
                                 "error": {
-                                    "type": "string"
+                                    "$ref": "#/components/schemas/ErrorDetails"
                                 }
                             }
                         }
@@ -516,7 +554,7 @@
                                     }
                                 },
                                 "error": {
-                                    "type": "string"
+                                    "$ref": "#/components/schemas/ErrorDetails"
                                 }
                             }
                         }
@@ -556,7 +594,7 @@
                                     }
                                 },
                                 "error": {
-                                    "type": "string"
+                                    "$ref": "#/components/schemas/ErrorDetails"
                                 }
                             }
                         }
@@ -596,7 +634,7 @@
                                     }
                                 },
                                 "error": {
-                                    "type": "string"
+                                    "$ref": "#/components/schemas/ErrorDetails"
                                 }
                             }
                         }
