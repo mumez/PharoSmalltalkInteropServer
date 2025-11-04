@@ -2,7 +2,8 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Pharo Smalltalk Interop Server API",
-        "version": "2.0.0"
+        "version": "3.0.0",
+        "description": "RESTful API for Smalltalk code introspection, manipulation, and UI debugging"
     },
     "servers": [
         {
@@ -430,10 +431,345 @@
                     }
                 }
             }
+        },
+        "/read-screen": {
+            "get": {
+                "summary": "Capture screenshot and extract UI structure for debugging Pharo UI",
+                "description": "UI screen reader for debugging Pharo UI issues. Captures screenshots and extracts morph hierarchy with bounds, colors, and structure. Supports World morphs, Spec presenters, and Roassal visualizations.",
+                "parameters": [
+                    {
+                        "name": "target_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["world", "spec", "roassal"],
+                            "default": "world"
+                        },
+                        "description": "UI type to inspect: 'world' (morphs), 'spec' (Spec windows/presenters), or 'roassal' (Roassal canvases)"
+                    },
+                    {
+                        "name": "capture_screenshot",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["true", "false"],
+                            "default": "true"
+                        },
+                        "description": "Include PNG screenshot in response"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/ReadScreenResponse"
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "Bounds": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "type": "integer",
+                        "description": "Left coordinate"
+                    },
+                    "y": {
+                        "type": "integer",
+                        "description": "Top coordinate"
+                    },
+                    "width": {
+                        "type": "integer",
+                        "description": "Width of the element"
+                    },
+                    "height": {
+                        "type": "integer",
+                        "description": "Height of the element"
+                    }
+                },
+                "required": ["x", "y", "width", "height"]
+            },
+            "MorphData": {
+                "type": "object",
+                "properties": {
+                    "class": {
+                        "type": "string",
+                        "description": "Morph class name"
+                    },
+                    "bounds": {
+                        "$ref": "#/components/schemas/Bounds"
+                    },
+                    "visible": {
+                        "type": "boolean"
+                    },
+                    "backgroundColor": {
+                        "type": "string"
+                    },
+                    "owner": {
+                        "type": "string"
+                    },
+                    "submorphCount": {
+                        "type": "integer"
+                    },
+                    "text": {
+                        "type": "string"
+                    }
+                },
+                "required": ["class", "bounds", "visible", "submorphCount"]
+            },
+            "PresenterInfo": {
+                "type": "object",
+                "properties": {
+                    "class": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "placeholder": {
+                        "type": "string"
+                    },
+                    "isEnabled": {
+                        "type": "boolean"
+                    },
+                    "isVisible": {
+                        "type": "boolean"
+                    },
+                    "childCount": {
+                        "type": "integer"
+                    },
+                    "children": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PresenterInfo"
+                        }
+                    }
+                },
+                "required": ["class", "childCount", "children"]
+            },
+            "RoassalShapeInfo": {
+                "type": "object",
+                "properties": {
+                    "class": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "string"
+                    },
+                    "extent": {
+                        "type": "string"
+                    },
+                    "color": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                },
+                "required": ["class"]
+            },
+            "RoassalEdgeInfo": {
+                "type": "object",
+                "properties": {
+                    "class": {
+                        "type": "string"
+                    },
+                    "from": {
+                        "type": "string"
+                    },
+                    "to": {
+                        "type": "string"
+                    },
+                    "color": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                },
+                "required": ["class"]
+            },
+            "RoassalCanvasInfo": {
+                "type": "object",
+                "properties": {
+                    "class": {
+                        "type": "string"
+                    },
+                    "canvasClass": {
+                        "type": "string"
+                    },
+                    "bounds": {
+                        "$ref": "#/components/schemas/Bounds"
+                    },
+                    "visible": {
+                        "type": "boolean"
+                    },
+                    "backgroundColor": {
+                        "type": "string"
+                    },
+                    "zoomLevel": {
+                        "type": "string"
+                    },
+                    "canvasExtent": {
+                        "type": "string"
+                    },
+                    "shapeCount": {
+                        "type": "integer"
+                    },
+                    "shapes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RoassalShapeInfo"
+                        }
+                    },
+                    "edgeCount": {
+                        "type": "integer"
+                    },
+                    "edges": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RoassalEdgeInfo"
+                        }
+                    },
+                    "nodeCount": {
+                        "type": "integer"
+                    }
+                },
+                "required": ["class"]
+            },
+            "WindowInfo": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "class": {
+                        "type": "string"
+                    },
+                    "extent": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "string"
+                    },
+                    "isMaximized": {
+                        "type": "boolean"
+                    },
+                    "isMinimized": {
+                        "type": "boolean"
+                    },
+                    "isResizable": {
+                        "type": "boolean"
+                    },
+                    "hasMenu": {
+                        "type": "boolean"
+                    },
+                    "hasToolbar": {
+                        "type": "boolean"
+                    },
+                    "hasStatusbar": {
+                        "type": "boolean"
+                    },
+                    "presenter": {
+                        "$ref": "#/components/schemas/PresenterInfo"
+                    }
+                },
+                "required": ["class"]
+            },
+            "WorldStructure": {
+                "type": "object",
+                "properties": {
+                    "totalMorphs": {
+                        "type": "integer"
+                    },
+                    "displayedMorphCount": {
+                        "type": "integer"
+                    },
+                    "morphs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MorphData"
+                        }
+                    }
+                },
+                "required": ["totalMorphs", "displayedMorphCount", "morphs"]
+            },
+            "SpecStructure": {
+                "type": "object",
+                "properties": {
+                    "windowCount": {
+                        "type": "integer"
+                    },
+                    "presenters": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WindowInfo"
+                        }
+                    }
+                },
+                "required": ["presenters"]
+            },
+            "RoassalStructure": {
+                "type": "object",
+                "properties": {
+                    "canvasCount": {
+                        "type": "integer"
+                    },
+                    "canvases": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RoassalCanvasInfo"
+                        }
+                    }
+                },
+                "required": ["canvases"]
+            },
+            "ReadScreenResult": {
+                "type": "object",
+                "properties": {
+                    "screenshot": {
+                        "type": "string",
+                        "description": "Path to the screenshot PNG file in temp directory"
+                    },
+                    "target_type": {
+                        "type": "string",
+                        "enum": ["world", "spec", "roassal"]
+                    },
+                    "structure": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/WorldStructure"
+                            },
+                            {
+                                "$ref": "#/components/schemas/SpecStructure"
+                            },
+                            {
+                                "$ref": "#/components/schemas/RoassalStructure"
+                            }
+                        ]
+                    },
+                    "summary": {
+                        "type": "string",
+                        "description": "Human-readable summary of the UI structure"
+                    }
+                },
+                "required": ["target_type", "structure", "summary"]
+            },
             "ErrorDetails": {
                 "type": "object",
                 "properties": {
@@ -643,6 +979,27 @@
                                             "method"
                                         ]
                                     }
+                                },
+                                "error": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "ReadScreenResponse": {
+                "description": "Response with UI structure and optional screenshot",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {
+                                    "$ref": "#/components/schemas/ReadScreenResult"
                                 },
                                 "error": {
                                     "$ref": "#/components/schemas/Error"
