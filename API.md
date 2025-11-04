@@ -67,6 +67,148 @@ This server provides a RESTful API with JSON responses for Smalltalk code intros
 ### Project Operations
 - `GET /install-project` - Install a project using Metacello
 
+### UI Debugging
+- `GET /read-screen` - UI screen reader for debugging Pharo UI issues, captures screenshots and extracts morph hierarchy with bounds, colors, and structure
+
+## Detailed Endpoint Documentation
+
+### Read Screen (`GET /read-screen`)
+
+Captures screenshot and extracts UI structure for debugging Pharo UI issues. Supports multiple UI frameworks: World morphs, Spec presenters, and Roassal visualizations.
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `target_type` | string | 'world' | UI type to inspect: 'world' (morphs), 'spec' (Spec windows/presenters), or 'roassal' (Roassal canvases) |
+| `capture_screenshot` | boolean | true | Include PNG screenshot in response |
+
+**Response Structure for World:**
+```json
+{
+  "success": true,
+  "result": {
+    "screenshot": "/private/tmp/pharo-ui-2025-11-03T00-44-31.462729+01-00.png",
+    "target_type": "world",
+    "structure": {
+      "totalMorphs": 12,
+      "displayedMorphCount": 1,
+      "morphs": [
+        {
+          "class": "MenubarMorph",
+          "visible": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 976,
+            "height": 18
+          },
+          "backgroundColor": "(Color r: 0.883... alpha: 0.8)",
+          "owner": "WorldMorph",
+          "submorphCount": 8
+        }
+      ]
+    },
+    "summary": "World with 12 top-level morphs"
+  }
+}
+```
+
+**Response Structure for Spec:**
+```json
+{
+  "success": true,
+  "result": {
+    "target_type": "spec",
+    "structure": {
+      "windowCount": 1,
+      "presenters": [
+        {
+          "title": "Welcome",
+          "class": "SpWindowPresenter",
+          "extent": "(700@550)",
+          "hasMenu": false,
+          "presenter": {
+            "class": "StWelcomeBrowser",
+            "childCount": 2,
+            "isVisible": true,
+            "children": []
+          }
+        }
+      ]
+    },
+    "summary": "1 Spec presenter(s)"
+  }
+}
+```
+
+**Response Structure for Roassal:**
+```json
+{
+  "success": true,
+  "result": {
+    "target_type": "roassal",
+    "structure": {
+      "canvasCount": 1,
+      "canvases": [
+        {
+          "class": "RSAthensMorph",
+          "canvasClass": "RSCanvas",
+          "bounds": {"x": 203, "y": 145, "width": 490, "height": 467},
+          "backgroundColor": "Color blue",
+          "zoomLevel": "1.0",
+          "shapeCount": 5,
+          "shapes": [
+            {
+              "class": "RSCircle",
+              "color": "(Color r: 1.0 g: 0.0 b: 0.0 alpha: 0.2)",
+              "position": "(0.0@0.0)",
+              "extent": "(5.0@5.0)"
+            }
+          ],
+          "edgeCount": 0,
+          "edges": [],
+          "nodeCount": 0
+        }
+      ]
+    },
+    "summary": "1 Roassal canvas(es)"
+  }
+}
+```
+
+**Data Extraction for Morphs (target_type='world'):**
+- Class name (type identification)
+- Bounds (x, y, width, height coordinates)
+- Visibility state
+- Background color
+- Structure (owner, submorphs count)
+- Text content (if available)
+
+**Data Extraction for Spec (target_type='spec'):**
+- Window title and class name
+- Geometry (extent, position)
+- Window state (maximized, minimized, resizable)
+- Decorations (menu, toolbar, statusbar presence)
+- Presenter hierarchy (recursive with max depth of 3 levels)
+- Presenter class name, child count, and content properties (label, text, value, placeholder, etc.)
+- Enablement and visibility state of presenters
+
+**Data Extraction for Roassal (target_type='roassal'):**
+- Canvas detection via recursive search through morph tree
+- Canvas location and geometry (bounds)
+- Visual properties (visibility, background color)
+- Canvas metadata (extent, zoom level)
+- Shape details: class, color, position, extent, label, text
+- Edge details: source, target, color, label
+- Node and edge counts
+
+**Implementation Details:**
+- **World morphs display limit**: Only the first 10 top-level morphs are extracted (for performance)
+- **Spec presenter recursion depth**: Presenter hierarchy is extracted up to 3 levels deep
+- **Screenshot file naming**: Files are stored in system temp directory as `/tmp/pharo-ui-{timestamp}.png` where timestamp is ISO 8601 format with colons replaced by dashes
+- **Roassal canvas detection**: Uses recursive `allMorphs` search to find RSAthensMorph instances throughout entire morph tree
+
 ## Usage Examples
 
 ### Evaluate Smalltalk Code

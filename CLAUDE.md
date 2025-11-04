@@ -32,6 +32,7 @@ The server provides extensive Smalltalk introspection and manipulation capabilit
 - Package export/import (Tonel format)
 - Test execution (package and class level)
 - Project installation (`/install-project`) using Metacello
+- UI debugging (`/read-screen`) - Screenshot capture and UI structure extraction for World morphs, Spec presenters, and Roassal visualizations
 
 ## Development Commands
 
@@ -39,6 +40,7 @@ The server provides extensive Smalltalk introspection and manipulation capabilit
 ```smalltalk
 SisServer current start   "Start the server"
 SisServer current stop    "Stop the server"
+SisServer restart         "Restart the server (stop, reset, start)"
 ```
 
 ### Configuration
@@ -74,6 +76,12 @@ Metacello new
 - SystemNavigation for code introspection
 - TonelWriter/TonelReader for package export/import
 - ZnEasy HTTP client for testing
+- UI debugging via `/read-screen` endpoint:
+  - Captures PNG screenshots to temp directory
+  - Extracts morph hierarchies with geometry, colors, and structure
+  - Supports Spec presenter introspection with recursive hierarchy extraction (up to 3 levels)
+  - Supports Roassal canvas analysis with shape/edge details
+  - Target types: 'world' (morphs), 'spec' (Spec presenters), 'roassal' (Roassal visualizations)
 
 ### Error Response Structure
 

@@ -12,6 +12,7 @@ A powerful web API server that bridges Pharo Smalltalk environments with externa
 - **Package Management**: Export and import packages in Tonel format
 - **Test Execution**: Run test suites at package or class level
 - **Project Installation**: Install Smalltalk projects using Metacello
+- **UI Debugging**: Capture screenshots and extract UI structure for World morphs, Spec presenters, and Roassal visualizations
 - **MCP Protocol**: Designed as a Model Context Protocol server core for AI integration
 
 ## Installation
