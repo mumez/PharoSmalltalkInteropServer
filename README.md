@@ -36,13 +36,16 @@ Metacello new
 
 ```Smalltalk
 "Start the server"
-SisServer current start
+SisServer current start.
 
 "Stop the server"
-SisServer current stop
+SisServer current stop.
 
 "Check server status"
-SisServer current
+SisServer current.
+
+"Restart for resetting the server"
+SisServer restart.
 ```
 
 ### Configuration
