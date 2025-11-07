@@ -3,7 +3,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'teapot',
-		'teapotConfig'
+		'teapotConfig',
+		'settings'
 	],
 	#classInstVars : [
 		'current',
@@ -14,10 +15,10 @@ Class {
 }
 
 { #category : 'instance creation' }
-SisServer class >> configure:  settingsDict [
+SisServer class >> configure:  teapotConfigDict [
 	| inst |
 	inst := self new.
-	inst teapotConfig: settingsDict.
+	inst teapotConfig: teapotConfigDict.
 	^ inst 
 ]
 
@@ -42,6 +43,12 @@ SisServer class >> current: anObject [
 ]
 
 { #category : 'defaults' }
+SisServer class >> defaultSettings [
+
+	^ { (#stackSize -> 100) } asDictionary
+]
+
+{ #category : 'defaults' }
 SisServer class >> defaultTeapotConfig [
 
 	^ {
@@ -53,7 +60,7 @@ SisServer class >> defaultTeapotConfig [
 SisServer class >> initialize [
 	SessionManager default registerUserClassNamed: self name.
 	
-	teapotConfig := self defaultTeapotConfig.
+	teapotConfig := self defaultTeapotConfig
 ]
 
 { #category : 'resetting' }
@@ -765,7 +772,7 @@ SisServer >> returnError: anError by: resultDict [
 	errorInfo := Dictionary new.
 	errorInfo at: 'description' put: anError description.
 	signalerContext := anError signalerContext.
-	errorInfo at: 'stack_trace' put: (String streamContents: [:strm | signalerContext debugStack: 500 on: strm]).
+	errorInfo at: 'stack_trace' put: (String streamContents: [:strm | signalerContext debugStack: self stackSize on: strm]).
 	errorInfo at: 'receiver' put: (self receiverErrorInfoFrom: signalerContext receiver).
 	resultDict at: 'error' put: errorInfo.
 	^ resultDict
@@ -780,6 +787,28 @@ SisServer >> returnResultDo: aBlock [
 		do: [ :ex | ^ self returnError: ex by: resultDict ].
 	resultDict at: 'success' put: true.
 	^ resultDict
+]
+
+{ #category : 'accessing' }
+SisServer >> settings [
+
+	^ settings ifNil: [ settings := self class defaultSettings ]
+]
+
+{ #category : 'accessing' }
+SisServer >> settings: anObject [
+
+	settings := anObject
+]
+
+{ #category : 'accessing - settings' }
+SisServer >> settingsAt: key [
+	^ self settings at: key ifAbsent: [ self class defaultSettings at: key  ]
+]
+
+{ #category : 'accessing - settings' }
+SisServer >> stackSize [
+	^ self settingsAt: #stackSize 
 ]
 
 { #category : 'actions' }
