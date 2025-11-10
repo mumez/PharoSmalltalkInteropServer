@@ -53,16 +53,16 @@ SisServer restart.
 
 ```Smalltalk
 "Change server port (default: 8086)"
-SisServer teapotConfig at: #port put: 9090
+SisServer teapotConfig at: #port put: 9090.
 
 "View current configuration"
-SisServer teapotConfig
+SisServer teapotConfig.
 
 "Configure server settings"
-SisServer current settings at: #stackSize put: 200
+SisServer current settings at: #stackSize put: 200.
 
 "View current settings"
-SisServer current settings
+SisServer current settings.
 ```
 
 ### Settings Management via API
