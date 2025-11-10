@@ -3,7 +3,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'teapot',
-		'teapotConfig'
+		'teapotConfig',
+		'settings'
 	],
 	#classInstVars : [
 		'current',
@@ -14,10 +15,10 @@ Class {
 }
 
 { #category : 'instance creation' }
-SisServer class >> configure:  settingsDict [
+SisServer class >> configure:  teapotConfigDict [
 	| inst |
 	inst := self new.
-	inst teapotConfig: settingsDict.
+	inst teapotConfig: teapotConfigDict.
 	^ inst 
 ]
 
@@ -42,6 +43,12 @@ SisServer class >> current: anObject [
 ]
 
 { #category : 'defaults' }
+SisServer class >> defaultSettings [
+
+	^ { (#stackSize -> 100) } asDictionary
+]
+
+{ #category : 'defaults' }
 SisServer class >> defaultTeapotConfig [
 
 	^ {
@@ -53,7 +60,7 @@ SisServer class >> defaultTeapotConfig [
 SisServer class >> initialize [
 	SessionManager default registerUserClassNamed: self name.
 	
-	teapotConfig := self defaultTeapotConfig.
+	teapotConfig := self defaultTeapotConfig
 ]
 
 { #category : 'resetting' }
@@ -102,6 +109,8 @@ SisServer >> createTeapot [
 
 	^ (Teapot configure: self teapotConfig associations)
 		  POST: '/eval' -> [ :req | self handleEval: req ];
+		  POST: '/apply-settings' -> [ :req | self handleApplySettings: req ];
+		  GET: '/get-settings' -> [ :req | self handleGetSettings: req ];
 		  GET: '/list-packages' -> [ :req | self handleListPackages: req ];
 		  GET: '/list-classes' -> [ :req | self handleListClasses: req ];
 		  GET: '/list-extended-classes'
@@ -479,6 +488,17 @@ SisServer >> extractWorldStructure [
 ]
 
 { #category : 'handling' }
+SisServer >> handleApplySettings: request [
+	^ self returnResultDo: [
+			  | requestJson newSettings |
+			  requestJson := NeoJSONReader fromString: request entity contents.
+			  newSettings := requestJson at: #settings.
+			  newSettings keysAndValuesDo: [ :key :value |
+				  self settings at: key asSymbol put: value ].
+			  'Settings applied successfully' ]
+]
+
+{ #category : 'handling' }
 SisServer >> handleEval: request [
 	^ self returnResultDo: [
 			  | requestJson code |
@@ -508,6 +528,11 @@ SisServer >> handleGetClassComment: request [
 		  className := request at: #class_name.
 		  class := Smalltalk globals at: className asSymbol.
 		  class comment ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleGetSettings: request [
+	^ self returnResultDo: [ self settings ]
 ]
 
 { #category : 'handling' }
@@ -765,7 +790,7 @@ SisServer >> returnError: anError by: resultDict [
 	errorInfo := Dictionary new.
 	errorInfo at: 'description' put: anError description.
 	signalerContext := anError signalerContext.
-	errorInfo at: 'stack_trace' put: (String streamContents: [:strm | signalerContext debugStack: 500 on: strm]).
+	errorInfo at: 'stack_trace' put: (String streamContents: [:strm | signalerContext debugStack: self stackSize on: strm]).
 	errorInfo at: 'receiver' put: (self receiverErrorInfoFrom: signalerContext receiver).
 	resultDict at: 'error' put: errorInfo.
 	^ resultDict
@@ -780,6 +805,28 @@ SisServer >> returnResultDo: aBlock [
 		do: [ :ex | ^ self returnError: ex by: resultDict ].
 	resultDict at: 'success' put: true.
 	^ resultDict
+]
+
+{ #category : 'accessing' }
+SisServer >> settings [
+
+	^ settings ifNil: [ settings := self class defaultSettings ]
+]
+
+{ #category : 'accessing' }
+SisServer >> settings: anObject [
+
+	settings := anObject
+]
+
+{ #category : 'accessing - settings' }
+SisServer >> settingsAt: key [
+	^ self settings at: key ifAbsent: [ self class defaultSettings at: key  ]
+]
+
+{ #category : 'accessing - settings' }
+SisServer >> stackSize [
+	^ self settingsAt: #stackSize 
 ]
 
 { #category : 'actions' }

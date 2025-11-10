@@ -2,8 +2,8 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Pharo Smalltalk Interop Server API",
-        "version": "3.0.0",
-        "description": "RESTful API for Smalltalk code introspection, manipulation, and UI debugging"
+        "version": "3.1.0",
+        "description": "RESTful API for Smalltalk code introspection, manipulation, UI debugging, and settings management"
     },
     "servers": [
         {
@@ -35,6 +35,46 @@
                 "responses": {
                     "200": {
                         "$ref": "#/components/responses/DefaultResponse"
+                    }
+                }
+            }
+        },
+        "/apply-settings": {
+            "post": {
+                "summary": "Apply server settings dynamically",
+                "description": "Updates server settings. Settings are applied immediately and persist for the current server session.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "settings": {
+                                        "$ref": "#/components/schemas/SettingsObject"
+                                    }
+                                },
+                                "required": [
+                                    "settings"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/StringResponse"
+                    }
+                }
+            }
+        },
+        "/get-settings": {
+            "get": {
+                "summary": "Get current server settings",
+                "description": "Retrieves all current server settings as a dictionary",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SettingsResponse"
                     }
                 }
             }
@@ -443,7 +483,11 @@
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "enum": ["world", "spec", "roassal"],
+                            "enum": [
+                                "world",
+                                "spec",
+                                "roassal"
+                            ],
                             "default": "world"
                         },
                         "description": "UI type to inspect: 'world' (morphs), 'spec' (Spec windows/presenters), or 'roassal' (Roassal canvases)"
@@ -454,7 +498,10 @@
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "enum": ["true", "false"],
+                            "enum": [
+                                "true",
+                                "false"
+                            ],
                             "default": "true"
                         },
                         "description": "Include PNG screenshot in response"
@@ -470,6 +517,18 @@
     },
     "components": {
         "schemas": {
+            "SettingsObject": {
+                "type": "object",
+                "description": "Server settings dictionary. Keys and values can be customized.",
+                "properties": {
+                    "stackSize": {
+                        "type": "integer",
+                        "description": "Maximum stack trace depth for error reporting",
+                        "default": 100
+                    }
+                },
+                "additionalProperties": true
+            },
             "Bounds": {
                 "type": "object",
                 "properties": {
@@ -490,7 +549,12 @@
                         "description": "Height of the element"
                     }
                 },
-                "required": ["x", "y", "width", "height"]
+                "required": [
+                    "x",
+                    "y",
+                    "width",
+                    "height"
+                ]
             },
             "MorphData": {
                 "type": "object",
@@ -518,7 +582,12 @@
                         "type": "string"
                     }
                 },
-                "required": ["class", "bounds", "visible", "submorphCount"]
+                "required": [
+                    "class",
+                    "bounds",
+                    "visible",
+                    "submorphCount"
+                ]
             },
             "PresenterInfo": {
                 "type": "object",
@@ -557,7 +626,11 @@
                         }
                     }
                 },
-                "required": ["class", "childCount", "children"]
+                "required": [
+                    "class",
+                    "childCount",
+                    "children"
+                ]
             },
             "RoassalShapeInfo": {
                 "type": "object",
@@ -581,7 +654,9 @@
                         "type": "string"
                     }
                 },
-                "required": ["class"]
+                "required": [
+                    "class"
+                ]
             },
             "RoassalEdgeInfo": {
                 "type": "object",
@@ -602,7 +677,9 @@
                         "type": "string"
                     }
                 },
-                "required": ["class"]
+                "required": [
+                    "class"
+                ]
             },
             "RoassalCanvasInfo": {
                 "type": "object",
@@ -650,7 +727,9 @@
                         "type": "integer"
                     }
                 },
-                "required": ["class"]
+                "required": [
+                    "class"
+                ]
             },
             "WindowInfo": {
                 "type": "object",
@@ -689,7 +768,9 @@
                         "$ref": "#/components/schemas/PresenterInfo"
                     }
                 },
-                "required": ["class"]
+                "required": [
+                    "class"
+                ]
             },
             "WorldStructure": {
                 "type": "object",
@@ -707,7 +788,11 @@
                         }
                     }
                 },
-                "required": ["totalMorphs", "displayedMorphCount", "morphs"]
+                "required": [
+                    "totalMorphs",
+                    "displayedMorphCount",
+                    "morphs"
+                ]
             },
             "SpecStructure": {
                 "type": "object",
@@ -722,7 +807,9 @@
                         }
                     }
                 },
-                "required": ["presenters"]
+                "required": [
+                    "presenters"
+                ]
             },
             "RoassalStructure": {
                 "type": "object",
@@ -737,7 +824,9 @@
                         }
                     }
                 },
-                "required": ["canvases"]
+                "required": [
+                    "canvases"
+                ]
             },
             "ReadScreenResult": {
                 "type": "object",
@@ -748,7 +837,11 @@
                     },
                     "target_type": {
                         "type": "string",
-                        "enum": ["world", "spec", "roassal"]
+                        "enum": [
+                            "world",
+                            "spec",
+                            "roassal"
+                        ]
                     },
                     "structure": {
                         "oneOf": [
@@ -768,7 +861,11 @@
                         "description": "Human-readable summary of the UI structure"
                     }
                 },
-                "required": ["target_type", "structure", "summary"]
+                "required": [
+                    "target_type",
+                    "structure",
+                    "summary"
+                ]
             },
             "ErrorDetails": {
                 "type": "object",
@@ -800,11 +897,17 @@
                                 "description": "Instance variables of the receiver object with their names and values"
                             }
                         },
-                        "required": ["class", "self", "variables"],
+                        "required": [
+                            "class",
+                            "self",
+                            "variables"
+                        ],
                         "description": "Information about the object that received the message causing the error"
                     }
                 },
-                "required": ["description"]
+                "required": [
+                    "description"
+                ]
             },
             "Error": {
                 "oneOf": [
@@ -1000,6 +1103,27 @@
                                 },
                                 "result": {
                                     "$ref": "#/components/schemas/ReadScreenResult"
+                                },
+                                "error": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "SettingsResponse": {
+                "description": "Response with current server settings",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                },
+                                "result": {
+                                    "$ref": "#/components/schemas/SettingsObject"
                                 },
                                 "error": {
                                     "$ref": "#/components/schemas/Error"

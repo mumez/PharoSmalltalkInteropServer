@@ -407,3 +407,33 @@ SisTest >> testSearchTraitsLike [
 	result := resp at: #result.
 	self assertCollection: result  equals: #('SisFixtureTraitForTest')
 ]
+
+{ #category : 'tests' }
+SisTest >> testApplySettings [
+	| url postData resp result getUrl getResp getResult |
+	url := self baseUrl / 'apply-settings'.
+	postData := { ('settings' -> { ('stackSize' -> 200). ('customKey' -> 'customValue') } asDictionary) } asDictionary.
+	resp := self post: url dictionary: postData.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'Settings applied successfully').
+
+	"Verify settings were actually applied"
+	getUrl := self baseUrl / 'get-settings'.
+	getResp := self get: getUrl.
+	self assert: (getResp at: #success).
+	getResult := getResp at: #result.
+	self assert: (getResult at: #stackSize) equals: 200.
+	self assert: (getResult at: #customKey) equals: 'customValue'
+]
+
+{ #category : 'tests' }
+SisTest >> testGetSettings [
+	| url resp result |
+	url := self baseUrl / 'get-settings'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result isKindOf: Dictionary).
+	self assert: (result includesKey: #stackSize)
+]
