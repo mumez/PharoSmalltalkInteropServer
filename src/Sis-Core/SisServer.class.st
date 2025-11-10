@@ -109,6 +109,8 @@ SisServer >> createTeapot [
 
 	^ (Teapot configure: self teapotConfig associations)
 		  POST: '/eval' -> [ :req | self handleEval: req ];
+		  POST: '/apply-settings' -> [ :req | self handleApplySettings: req ];
+		  GET: '/get-settings' -> [ :req | self handleGetSettings: req ];
 		  GET: '/list-packages' -> [ :req | self handleListPackages: req ];
 		  GET: '/list-classes' -> [ :req | self handleListClasses: req ];
 		  GET: '/list-extended-classes'
@@ -486,6 +488,17 @@ SisServer >> extractWorldStructure [
 ]
 
 { #category : 'handling' }
+SisServer >> handleApplySettings: request [
+	^ self returnResultDo: [
+			  | requestJson newSettings |
+			  requestJson := NeoJSONReader fromString: request entity contents.
+			  newSettings := requestJson at: #settings.
+			  newSettings keysAndValuesDo: [ :key :value |
+				  self settings at: key asSymbol put: value ].
+			  'Settings applied successfully' ]
+]
+
+{ #category : 'handling' }
 SisServer >> handleEval: request [
 	^ self returnResultDo: [
 			  | requestJson code |
@@ -515,6 +528,11 @@ SisServer >> handleGetClassComment: request [
 		  className := request at: #class_name.
 		  class := Smalltalk globals at: className asSymbol.
 		  class comment ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleGetSettings: request [
+	^ self returnResultDo: [ self settings ]
 ]
 
 { #category : 'handling' }
