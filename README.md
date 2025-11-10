@@ -7,6 +7,7 @@ A powerful web API server that bridges Pharo Smalltalk environments with externa
 ## Features
 
 - **Code Evaluation**: Execute Smalltalk expressions and return results
+- **Settings Management**: Dynamically configure server settings via API endpoints
 - **Code Introspection**: Retrieve source code, comments, and metadata for classes and methods
 - **Search & Discovery**: Find classes, traits, methods, references, and implementors
 - **Package Management**: Export and import packages in Tonel format
@@ -56,6 +57,26 @@ SisServer teapotConfig at: #port put: 9090
 
 "View current configuration"
 SisServer teapotConfig
+
+"Configure server settings"
+SisServer current settings at: #stackSize put: 200
+
+"View current settings"
+SisServer current settings
+```
+
+### Settings Management via API
+
+You can also manage settings through HTTP endpoints:
+
+```bash
+# Get current settings
+curl http://localhost:8086/get-settings
+
+# Apply new settings
+curl -X POST http://localhost:8086/apply-settings \
+  -H "Content-Type: application/json" \
+  -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
 ```
 
 ### Auto-restart Behavior
