@@ -27,6 +27,7 @@ PharoSmalltalkInteropServer is a Smalltalk-based web API server that provides in
 The server provides extensive Smalltalk introspection and manipulation capabilities:
 
 - Code evaluation (`/eval/`)
+- Settings management (`/apply-settings`, `/get-settings`) - Dynamic server configuration
 - Package/class/method listing and source retrieval
 - Search functionality (classes, traits, methods, references, implementors)
 - Package export/import (Tonel format)
@@ -46,6 +47,10 @@ SisServer restart         "Restart the server (stop, reset, start)"
 ### Configuration
 ```smalltalk
 SisServer teapotConfig at: #port put: 8080   "Change port"
+
+"Settings management"
+SisServer current settings at: #stackSize put: 200   "Change stack size"
+SisServer current settings   "View current settings"
 ```
 
 ### Running Tests
@@ -73,6 +78,10 @@ Metacello new
 - JSON request/response format via NeoJSON
 - Error handling wraps all operations in `returnResultDo:` pattern
 - Comprehensive error reporting via `returnError:by:` with stack traces and receiver context
+- Settings management via instance variable with default values:
+  - Default settings defined in `SisServer class >> defaultSettings`
+  - Settings accessible via `/apply-settings` (POST) and `/get-settings` (GET) endpoints
+  - Common settings: `stackSize` (controls error stack trace depth, default: 100)
 - SystemNavigation for code introspection
 - TonelWriter/TonelReader for package export/import
 - ZnEasy HTTP client for testing

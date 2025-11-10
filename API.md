@@ -70,6 +70,10 @@ This server provides a RESTful API with JSON responses for Smalltalk code intros
 ### UI Debugging
 - `GET /read-screen` - UI screen reader for debugging Pharo UI issues, captures screenshots and extracts morph hierarchy with bounds, colors, and structure
 
+### Settings Management
+- `POST /apply-settings` - Apply server settings
+- `GET /get-settings` - Get current server settings
+
 ## Detailed Endpoint Documentation
 
 ### Read Screen (`GET /read-screen`)
@@ -208,6 +212,56 @@ Captures screenshot and extracts UI structure for debugging Pharo UI issues. Sup
 - **Spec presenter recursion depth**: Presenter hierarchy is extracted up to 3 levels deep
 - **Screenshot file naming**: Files are stored in system temp directory as `/tmp/pharo-ui-{timestamp}.png` where timestamp is ISO 8601 format with colons replaced by dashes
 - **Roassal canvas detection**: Uses recursive `allMorphs` search to find RSAthensMorph instances throughout entire morph tree
+
+### Apply Settings (`POST /apply-settings`)
+
+Updates server settings dynamically. Settings are applied immediately and persist for the current server session.
+
+**Request Body:**
+```json
+{
+  "settings": {
+    "stackSize": 200,
+    "customKey": "customValue"
+  }
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `settings` | object | Dictionary of setting key-value pairs to apply |
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": "Settings applied successfully"
+}
+```
+
+**Common Settings:**
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `stackSize` | integer | 100 | Maximum stack trace depth for error reporting |
+
+
+### Get Settings (`GET /get-settings`)
+
+Retrieves current server settings.
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": {
+    "stackSize": 100,
+    "customKey": "customValue"
+  }
+}
+```
 
 ## Usage Examples
 
