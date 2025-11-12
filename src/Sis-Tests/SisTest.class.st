@@ -437,3 +437,43 @@ SisTest >> testGetSettings [
 	self assert: (result isKindOf: Dictionary).
 	self assert: (result includesKey: #stackSize)
 ]
+
+{ #category : 'tests' }
+SisTest >> testApplySettingsWithSnakeCaseKeys [
+	"Test that snake_case keys are normalized to camelCase"
+	| url postData resp result getUrl getResp getResult |
+	url := self baseUrl / 'apply-settings'.
+	postData := { ('settings' -> { ('stack_size' -> 150). ('custom_key' -> 'snakeCaseValue') } asDictionary) } asDictionary.
+	resp := self post: url dictionary: postData.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'Settings applied successfully').
+
+	"Verify settings were normalized to camelCase"
+	getUrl := self baseUrl / 'get-settings'.
+	getResp := self get: getUrl.
+	self assert: (getResp at: #success).
+	getResult := getResp at: #result.
+	self assert: (getResult at: #stackSize) equals: 150.
+	self assert: (getResult at: #customKey) equals: 'snakeCaseValue'
+]
+
+{ #category : 'tests' }
+SisTest >> testApplySettingsWithMixedCaseKeys [
+	"Test that both camelCase and snake_case keys can be used together"
+	| url postData resp result getUrl getResp getResult |
+	url := self baseUrl / 'apply-settings'.
+	postData := { ('settings' -> { ('stackSize' -> 180). ('another_key' -> 'mixedValue') } asDictionary) } asDictionary.
+	resp := self post: url dictionary: postData.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'Settings applied successfully').
+
+	"Verify both settings were applied correctly"
+	getUrl := self baseUrl / 'get-settings'.
+	getResp := self get: getUrl.
+	self assert: (getResp at: #success).
+	getResult := getResp at: #result.
+	self assert: (getResult at: #stackSize) equals: 180.
+	self assert: (getResult at: #anotherKey) equals: 'mixedValue'
+]

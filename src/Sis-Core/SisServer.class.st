@@ -493,8 +493,9 @@ SisServer >> handleApplySettings: request [
 			  | requestJson newSettings |
 			  requestJson := NeoJSONReader fromString: request entity contents.
 			  newSettings := requestJson at: #settings.
-			  newSettings keysAndValuesDo: [ :key :value |
-				  self settings at: key asSymbol put: value ].
+			  newSettings keysAndValuesDo: [ :key :value | | settingsKey |
+			  	settingsKey := self asCamelCase: key.
+				self settings at: settingsKey asSymbol put: value ].
 			  'Settings applied successfully' ]
 ]
 
@@ -805,6 +806,11 @@ SisServer >> returnResultDo: aBlock [
 		do: [ :ex | ^ self returnError: ex by: resultDict ].
 	resultDict at: 'success' put: true.
 	^ resultDict
+]
+
+{ #category : 'private' }
+SisServer >> asCamelCase: aString [
+	^ (aString copyReplaceAll: '_' with: ' ') asCamelCase uncapitalized
 ]
 
 { #category : 'accessing' }
