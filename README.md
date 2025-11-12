@@ -67,16 +67,21 @@ SisServer current settings.
 
 ### Settings Management via API
 
-You can also manage settings through HTTP endpoints:
+You can also manage settings through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
 
 ```bash
 # Get current settings
 curl http://localhost:8086/get-settings
 
-# Apply new settings
+# Apply new settings (using camelCase)
 curl -X POST http://localhost:8086/apply-settings \
   -H "Content-Type: application/json" \
   -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
+
+# Apply new settings (using snake_case - automatically normalized to camelCase)
+curl -X POST http://localhost:8086/apply-settings \
+  -H "Content-Type: application/json" \
+  -d '{"settings": {"stack_size": 150, "custom_key": "value"}}'
 ```
 
 ### Auto-restart Behavior

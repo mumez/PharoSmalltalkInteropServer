@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Pharo Smalltalk Interop Server API",
-        "version": "3.1.0",
+        "version": "3.1.1",
         "description": "RESTful API for Smalltalk code introspection, manipulation, UI debugging, and settings management"
     },
     "servers": [
@@ -42,7 +42,7 @@
         "/apply-settings": {
             "post": {
                 "summary": "Apply server settings dynamically",
-                "description": "Updates server settings. Settings are applied immediately and persist for the current server session.",
+                "description": "Updates server settings. Settings are applied immediately and persist for the current server session. Keys can be provided in either camelCase or snake_case format (e.g., 'stackSize' or 'stack_size'), and snake_case keys are automatically normalized to camelCase.",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -519,15 +519,21 @@
         "schemas": {
             "SettingsObject": {
                 "type": "object",
-                "description": "Server settings dictionary. Keys and values can be customized.",
+                "description": "Server settings dictionary. Keys can be specified in either camelCase or snake_case format (e.g., 'stackSize' or 'stack_size'). Snake_case keys are automatically normalized to camelCase. Keys and values can be customized.",
                 "properties": {
                     "stackSize": {
                         "type": "integer",
-                        "description": "Maximum stack trace depth for error reporting",
+                        "description": "Maximum stack trace depth for error reporting (also accepts 'stack_size')",
                         "default": 100
                     }
                 },
-                "additionalProperties": true
+                "additionalProperties": true,
+                "example": {
+                    "stackSize": 150,
+                    "stack_size": 150,
+                    "customKey": "value",
+                    "custom_key": "value"
+                }
             },
             "Bounds": {
                 "type": "object",

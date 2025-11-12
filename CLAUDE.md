@@ -81,6 +81,7 @@ Metacello new
 - Settings management via instance variable with default values:
   - Default settings defined in `SisServer class >> defaultSettings`
   - Settings accessible via `/apply-settings` (POST) and `/get-settings` (GET) endpoints
+  - Key naming flexibility: Accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), with automatic normalization to camelCase
   - Common settings: `stackSize` (controls error stack trace depth, default: 100)
 - SystemNavigation for code introspection
 - TonelWriter/TonelReader for package export/import
