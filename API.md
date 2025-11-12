@@ -217,7 +217,10 @@ Captures screenshot and extracts UI structure for debugging Pharo UI issues. Sup
 
 Updates server settings dynamically. Settings are applied immediately and persist for the current server session.
 
-**Request Body:**
+**Key Naming Convention:**
+The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`). Snake_case keys are automatically normalized to camelCase internally, allowing flexible integration with different programming language conventions.
+
+**Request Body (camelCase):**
 ```json
 {
   "settings": {
@@ -227,11 +230,21 @@ Updates server settings dynamically. Settings are applied immediately and persis
 }
 ```
 
+**Request Body (snake_case - automatically normalized):**
+```json
+{
+  "settings": {
+    "stack_size": 200,
+    "custom_key": "customValue"
+  }
+}
+```
+
 **Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `settings` | object | Dictionary of setting key-value pairs to apply |
+| `settings` | object | Dictionary of setting key-value pairs to apply. Keys can be in camelCase or snake_case format. |
 
 **Response:**
 ```json
@@ -245,7 +258,7 @@ Updates server settings dynamically. Settings are applied immediately and persis
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `stackSize` | integer | 100 | Maximum stack trace depth for error reporting |
+| `stackSize` (or `stack_size`) | integer | 100 | Maximum stack trace depth for error reporting |
 
 
 ### Get Settings (`GET /get-settings`)
