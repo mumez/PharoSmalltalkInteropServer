@@ -549,9 +549,10 @@ SisServer >> handleGetClassSource: request [
 SisServer >> handleGetMethodSource: request [
 
 	^ self returnResultDo: [
-			  | tokens isClassSide className methodName targetClass |
+			  | tokens isClassMethod isClassSide className methodName targetClass |
 			  tokens := (request at: #class_name) findTokens: ' '.
-			  isClassSide := tokens size = 2.
+			  isClassMethod := request at: #is_class_method ifAbsent: ['false'].
+			  isClassSide := tokens size = 2 or: [isClassMethod trimBoth asLowercase = 'true'].
 			  className := tokens first.
 			  methodName := request at: #method_name.
 			  targetClass := Smalltalk globals at: className asSymbol.

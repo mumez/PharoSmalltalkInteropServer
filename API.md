@@ -50,7 +50,7 @@ This server provides a RESTful API with JSON responses for Smalltalk code intros
 
 ### Method Operations
 - `GET /list-methods` - Get list of methods in a package
-- `GET /get-method-source` - Get source code of a specific method
+- `GET /get-method-source` - Get source code of a specific method (supports `is_class_method` parameter for class-side methods)
 
 ### Search Operations
 - `GET /search-classes-like` - Search class names that start with the given query
@@ -307,6 +307,18 @@ curl "http://localhost:8086/search-classes-like?class_name_query=SisFixture"
 ```
 
 ### Get Method Source
+
+Get the source code of a specific method from a class.
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `class_name` | string | required | Name of the class containing the method |
+| `method_name` | string | required | Name of the method to retrieve |
+| `is_class_method` | boolean | false | Set to `true` to retrieve a class-side method, `false` for instance-side method |
+
+**Example - Instance Method:**
 ```bash
 curl "http://localhost:8086/get-method-source?class_name=SisFixtureClassForTest&method_name=testMethodBbb"
 ```
@@ -315,9 +327,29 @@ curl "http://localhost:8086/get-method-source?class_name=SisFixtureClassForTest&
 ```json
 {
   "success": true,
-  "result": "testMethodBbb\n\t^ TestSymbolBBB"
+  "result": "testMethodBbb\n\t^ #TestSymbolBBB"
 }
 ```
+
+**Example - Class Method (using is_class_method parameter):**
+```bash
+curl "http://localhost:8086/get-method-source?class_name=Array&method_name=with:&is_class_method=true"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": "with: anObject\n\t^ self new: 1 streamContents: [ :s | s nextPut: anObject ]"
+}
+```
+
+**Example - Class Method (legacy syntax with 'class' suffix):**
+```bash
+curl "http://localhost:8086/get-method-source?class_name=Array%20class&method_name=with:"
+```
+
+**Note:** The `is_class_method` parameter provides a cleaner alternative to appending ' class' to the class name. Both methods are supported for backward compatibility.
 
 
 ### Run Package Tests
