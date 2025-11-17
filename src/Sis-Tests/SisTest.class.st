@@ -105,10 +105,55 @@ SisTest >> testGetClassSource [
 
 { #category : 'tests' }
 SisTest >> testGetMethodSource [
+	"Test getting an instance method source"
 	| url resp result |
 	url := self baseUrl / 'get-method-source'.
 	url queryAt: 'class_name' put: 'SisFixtureClassForTest'.
 	url queryAt: 'method_name' put: 'testMethodBbb'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'testMethodBbb').
+	self assert: (result includesSubstring: 'TestSymbolBBB')
+]
+
+{ #category : 'tests' }
+SisTest >> testGetMethodSourceClassMethodOldWay [
+	"Test getting a class method using the old 'ClassName class' syntax"
+	| url resp result |
+	url := self baseUrl / 'get-method-source'.
+	url queryAt: 'class_name' put: 'SisFixtureClassForTest class'.
+	url queryAt: 'method_name' put: 'testClassMethodCcc'.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'testClassMethodCcc').
+	self assert: (result includesSubstring: 'TestClassMethodCCC')
+]
+
+{ #category : 'tests' }
+SisTest >> testGetMethodSourceClassMethodWithFlag [
+	"Test getting a class method using the is_class_method parameter"
+	| url resp result |
+	url := self baseUrl / 'get-method-source'.
+	url queryAt: 'class_name' put: 'SisFixtureClassForTest'.
+	url queryAt: 'method_name' put: 'testClassMethodCcc'.
+	url queryAt: 'is_class_method' put: true.
+	resp := self get: url.
+	self assert: (resp at: #success).
+	result := resp at: #result.
+	self assert: (result includesSubstring: 'testClassMethodCcc').
+	self assert: (result includesSubstring: 'TestClassMethodCCC')
+]
+
+{ #category : 'tests' }
+SisTest >> testGetMethodSourceClassMethodWithFalseFlag [
+	"Test that is_class_method=false returns instance method"
+	| url resp result |
+	url := self baseUrl / 'get-method-source'.
+	url queryAt: 'class_name' put: 'SisFixtureClassForTest'.
+	url queryAt: 'method_name' put: 'testMethodBbb'.
+	url queryAt: 'is_class_method' put: false.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.

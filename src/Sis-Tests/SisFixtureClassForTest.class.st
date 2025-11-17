@@ -25,3 +25,9 @@ SisFixtureClassForTest >> testMethodAab [
 SisFixtureClassForTest >> testMethodBbb [
 	^ #TestSymbolBBB
 ]
+
+{ #category : 'class methods' }
+SisFixtureClassForTest class >> testClassMethodCcc [
+	"A class-side method for testing the is_class_method parameter"
+	^ #TestClassMethodCCC
+]

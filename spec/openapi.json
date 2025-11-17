@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Pharo Smalltalk Interop Server API",
-        "version": "3.1.1",
+        "version": "3.2.0",
         "description": "RESTful API for Smalltalk code introspection, manipulation, UI debugging, and settings management"
     },
     "servers": [
@@ -172,7 +172,7 @@
         "/get-method-source": {
             "get": {
                 "summary": "Get source code of a specific method",
-                "description": "Get source code of a specific method. For class-side methods, append ' class' to the class name (e.g., 'MyClass class').",
+                "description": "Get source code of a specific method. For class-side methods, you can either set is_class_method=true or append ' class' to the class name (legacy syntax).",
                 "parameters": [
                     {
                         "name": "class_name",
@@ -181,7 +181,7 @@
                         "schema": {
                             "type": "string"
                         },
-                        "description": "Class name. For class-side methods, append ' class' (e.g., 'MyClass class')"
+                        "description": "Class name without ' class' suffix when using is_class_method parameter"
                     },
                     {
                         "name": "method_name",
@@ -189,7 +189,22 @@
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Method selector name"
+                    },
+                    {
+                        "name": "is_class_method",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "true",
+                                "false"
+                            ],
+                            "default": "false"
+                        },
+                        "description": "Set to 'true' to retrieve a class-side method, 'false' for instance-side method. Provides a cleaner alternative to appending ' class' to class_name."
                     }
                 ],
                 "responses": {

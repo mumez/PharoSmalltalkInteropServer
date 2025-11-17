@@ -29,6 +29,7 @@ The server provides extensive Smalltalk introspection and manipulation capabilit
 - Code evaluation (`/eval/`)
 - Settings management (`/apply-settings`, `/get-settings`) - Dynamic server configuration
 - Package/class/method listing and source retrieval
+  - Method source retrieval supports `is_class_method` parameter for class-side methods
 - Search functionality (classes, traits, methods, references, implementors)
 - Package export/import (Tonel format)
 - Test execution (package and class level)
@@ -78,6 +79,10 @@ Metacello new
 - JSON request/response format via NeoJSON
 - Error handling wraps all operations in `returnResultDo:` pattern
 - Comprehensive error reporting via `returnError:by:` with stack traces and receiver context
+- Method source retrieval (`/get-method-source`) with class-side support:
+  - `is_class_method` parameter: Set to 'true' to retrieve class-side methods
+  - Backward compatible: Still supports 'ClassName class' syntax
+  - String-to-boolean conversion: Accepts 'true'/'false' strings from query parameters
 - Settings management via instance variable with default values:
   - Default settings defined in `SisServer class >> defaultSettings`
   - Settings accessible via `/apply-settings` (POST) and `/get-settings` (GET) endpoints
@@ -118,9 +123,15 @@ The test suite (`SisTest`) validates all API endpoints by:
 - Starting HTTP requests against running server
 - Validating JSON response structure (`success` flag, `result`/`error` fields)
 - Using fixture classes/traits for consistent test data
+  - `SisFixtureClassForTest` includes both instance and class methods for testing
 - Testing both positive and error cases
 - Comprehensive error response validation including stack traces and receiver information
 - Error case testing with `testEvalWithError` (validates ZeroDivide error handling)
+- Method source retrieval testing:
+  - `testGetMethodSource` - Instance method retrieval
+  - `testGetMethodSourceClassMethodOldWay` - Class method via 'ClassName class' syntax
+  - `testGetMethodSourceClassMethodWithFlag` - Class method via `is_class_method=true`
+  - `testGetMethodSourceClassMethodWithFalseFlag` - Explicit `is_class_method=false`
 
 ## Dependencies
 
