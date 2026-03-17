@@ -76,7 +76,7 @@ SisSettings >> initFrom: otherSettings [
 
 { #category : 'accessing' }
 SisSettings >> port [
-	^ self at: #port ifAbsentPut: [ (self envAt: 'PHARO_SIS_PORT' ifAbsentPut: [ 8086 ]) asNumber ]
+	^ self at: #port ifAbsentPut: [ (self envAt: 'PHARO_SIS_PORT' ifAbsent: [ 8086 ]) asNumber ]
 ]
 
 { #category : 'accessing' }
@@ -133,6 +133,6 @@ SisSettings >> asDictionary [
 ]
 
 { #category : 'private' }
-SisSettings >> envAt: key ifAbsentPut: aBlock [
-    ^ OSEnvironment current at: key ifAbsentPut: aBlock
+SisSettings >> envAt: key ifAbsent: aBlock [
+    ^ OSEnvironment current at: key ifAbsent: aBlock
 ]
