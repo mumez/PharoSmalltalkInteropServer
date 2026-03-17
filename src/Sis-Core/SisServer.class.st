@@ -7,8 +7,7 @@ Class {
 		'settings'
 	],
 	#classInstVars : [
-		'current',
-		'teapotConfig'
+		'current'
 	],
 	#category : 'Sis-Core',
 	#package : 'Sis-Core'
@@ -19,13 +18,13 @@ SisServer class >> configure:  teapotConfigDict [
 	| inst |
 	inst := self new.
 	inst teapotConfig: teapotConfigDict.
-	^ inst 
+	^ inst
 ]
 
 { #category : 'instance creation' }
 SisServer class >> createStarted [
 	| inst |
-	inst := self configure: self teapotConfig.
+	inst := self configure: self defaultSettings teapotConfig.
 	inst start.
 	^ inst
 ]
@@ -45,22 +44,12 @@ SisServer class >> current: anObject [
 { #category : 'defaults' }
 SisServer class >> defaultSettings [
 
-	^ { (#stackSize -> 100) } asDictionary
-]
-
-{ #category : 'defaults' }
-SisServer class >> defaultTeapotConfig [
-
-	^ {
-		  (#defaultOutput -> #json).
-		  (#port -> 8086) } asDictionary
+	^ SisSettings default
 ]
 
 { #category : 'class initialization' }
 SisServer class >> initialize [
 	SessionManager default registerUserClassNamed: self name.
-	
-	teapotConfig := self defaultTeapotConfig
 ]
 
 { #category : 'resetting' }
@@ -75,17 +64,12 @@ SisServer class >> restart [
 SisServer class >> startUp: isImageStarting [
 
 	isImageStarting ifFalse: [ ^ self ].
-	
+
 	current ifNotNil: [ current stop ].
 	current := nil.
-	
+
 	Smalltalk session
 		addDeferredStartupAction: [ self current ]
-]
-
-{ #category : 'accessing' }
-SisServer class >> teapotConfig [
-	^  teapotConfig
 ]
 
 { #category : 'private - ui extraction' }
@@ -533,7 +517,7 @@ SisServer >> handleGetClassComment: request [
 
 { #category : 'handling' }
 SisServer >> handleGetSettings: request [
-	^ self returnResultDo: [ self settings ]
+	^ self returnResultDo: [ self settings settingsDict ]
 ]
 
 { #category : 'handling' }
@@ -828,12 +812,12 @@ SisServer >> settings: anObject [
 
 { #category : 'accessing - settings' }
 SisServer >> settingsAt: key [
-	^ self settings at: key ifAbsent: [ self class defaultSettings at: key  ]
+	^ self settings at: key
 ]
 
 { #category : 'accessing - settings' }
 SisServer >> stackSize [
-	^ self settingsAt: #stackSize 
+	^ self settings stackSize
 ]
 
 { #category : 'actions' }
