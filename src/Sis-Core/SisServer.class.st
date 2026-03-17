@@ -24,7 +24,7 @@ SisServer class >> configure:  teapotConfigDict [
 { #category : 'instance creation' }
 SisServer class >> createStarted [
 	| inst |
-	inst := self configure: self defaultSettings teapotConfig.
+	inst := self configure: self defaultSettingsCopied teapotConfig.
 	inst start.
 	^ inst
 ]
@@ -42,9 +42,9 @@ SisServer class >> current: anObject [
 ]
 
 { #category : 'defaults' }
-SisServer class >> defaultSettings [
+SisServer class >> defaultSettingsCopied [
 
-	^ SisSettings default
+	^ SisSettings defaultCopied
 ]
 
 { #category : 'class initialization' }
@@ -517,7 +517,7 @@ SisServer >> handleGetClassComment: request [
 
 { #category : 'handling' }
 SisServer >> handleGetSettings: request [
-	^ self returnResultDo: [ self settings settingsDict ]
+	^ self returnResultDo: [ self settings asDictionary ]
 ]
 
 { #category : 'handling' }
@@ -801,7 +801,7 @@ SisServer >> asCamelCase: aString [
 { #category : 'accessing' }
 SisServer >> settings [
 
-	^ settings ifNil: [ settings := self class defaultSettings ]
+	^ settings ifNil: [ settings := self class defaultSettingsCopied ]
 ]
 
 { #category : 'accessing' }

@@ -16,6 +16,11 @@ SisSettings class >> default [
 	^ default ifNil: [ default := self new ]
 ]
 
+{ #category : 'instance creation' }
+SisSettings class >> defaultCopied [
+	^ self new initFrom: self default
+]
+
 { #category : 'class initialization' }
 SisSettings class >> initialize [
 	super initialize.
@@ -42,6 +47,11 @@ SisSettings >> at: key put: value [
 	^ self settingsDict at: key put: value
 ]
 
+{ #category : 'actions-dictionary' }
+SisSettings >> keys [
+	^ self settingsDict keys
+]
+
 { #category : 'accessing' }
 SisSettings >> defaultOutput [
 	^ self at: #defaultOutput ifAbsentPut: [ #json ]
@@ -52,9 +62,16 @@ SisSettings >> defaultOutput: aSymbol [
 	self at: #defaultOutput put: aSymbol
 ]
 
-{ #category : 'initialize-release' }
+{ #category : 'initialization' }
 SisSettings >> initialize [
 	settingsDict := nil
+]
+
+{ #category : 'initialization' }
+SisSettings >> initFrom: otherSettings [
+	self initialize.
+	otherSettings settingsDict keysAndValuesDo: [ :k :v |
+		self settingsDict at: k put: v ]
 ]
 
 { #category : 'accessing' }
@@ -87,6 +104,21 @@ SisSettings >> stackSize: aNumber [
 	self at: #stackSize put: aNumber
 ]
 
+{ #category : 'accessing-keys' }
+SisSettings >> teapotConfigKeys [
+	^ #(#defaultOutput #port)
+]
+
+{ #category : 'accessing-keys' }
+SisSettings >> definedSettingsKeys [
+	^ #(#stackSize)
+]
+
+{ #category : 'private' }
+SisSettings >> ensureDefinedKeys [
+	self definedSettingsKeys do: [:each | self perform: each asSymbol ]
+]
+
 { #category : 'converting' }
 SisSettings >> teapotConfig [
 	^ self teapotConfigKeys inject: Dictionary new into: [ :dict :key |
@@ -94,8 +126,8 @@ SisSettings >> teapotConfig [
 		yourself ]
 ]
 
-{ #category : 'accessing' }
-SisSettings >> teapotConfigKeys [
-	^ #(#defaultOutput #port)
+{ #category : 'converting' }
+SisSettings >> asDictionary [
+    self ensureDefinedKeys.
+	^ (self keys collect: [ :each | each -> (self at: each)]) asDictionary
 ]
-
