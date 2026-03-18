@@ -5,6 +5,22 @@ Class {
 	#package : 'Sis-Tests'
 }
 
+{ #category : 'tests-settings' }
+SisTest >> testSettingsFallbackEnvVarFound [
+	| settings result |
+	settings := SisSettings new.
+	result := settings at: #testPath fallback: {'PATH'. ''}.
+	self assert: result equals: (OSEnvironment current at: 'PATH' ifAbsent: [''])
+]
+
+{ #category : 'tests-settings' }
+SisTest >> testSettingsFallbackEnvVarAbsent [
+	| settings result |
+	settings := SisSettings new.
+	result := settings at: #testPort fallback: {'PHARO_SIS_NONEXISTENT_XYZ'. 9999} type: Integer.
+	self assert: result equals: 9999
+]
+
 { #category : 'private' }
 SisTest >> baseUrl [
 	| port |
