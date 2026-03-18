@@ -620,7 +620,7 @@ SisServer >> handleReadScreen: request [
 		filename := nil.
 		captureScreenshot ifTrue: [
 			timestamp := DateAndTime now asString copyReplaceAll: ':' with: '-'.
-			tempDir := FileLocator temp.
+			tempDir := self settings screenshotDirectory.
 			filename := (tempDir / ('pharo-ui-', timestamp, '.png')) fullName.
 			form := self currentWorld imageForm.
 			PNGReadWriter putForm: form onFileNamed: filename

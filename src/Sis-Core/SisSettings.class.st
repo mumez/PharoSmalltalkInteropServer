@@ -38,6 +38,23 @@ SisSettings >> at: key ifAbsent: aBlock [
 ]
 
 { #category : 'actions-dictionary' }
+SisSettings >> at: key fallback: anArray type: aClass [
+	| rawValue |
+	rawValue := self at: key fallback: anArray.
+	^ rawValue ifNotNil: [ aClass readFrom: rawValue asString ]
+]
+
+{ #category : 'actions-dictionary' }
+SisSettings >> at: key fallback: anArray [
+	^ self at: key ifAbsentPut: [
+		| envKey default rawValue |
+		envKey := anArray first.
+		default := anArray last.
+		self envAt: envKey ifAbsent: [ default ].
+	]
+]
+
+{ #category : 'actions-dictionary' }
 SisSettings >> at: key ifAbsentPut: aBlock [
 	^ self settingsDict at: key ifAbsentPut: aBlock
 ]
@@ -76,7 +93,7 @@ SisSettings >> initFrom: otherSettings [
 
 { #category : 'accessing' }
 SisSettings >> port [
-	^ self at: #port ifAbsentPut: [ (self envAt: 'PHARO_SIS_PORT' ifAbsent: [ 8086 ]) asNumber ]
+	^ self at: #port fallback: {'PHARO_SIS_PORT'. 8086} type: Integer
 ]
 
 { #category : 'accessing' }
@@ -92,6 +109,21 @@ SisSettings >> settingsDict [
 { #category : 'accessing-private' }
 SisSettings >> settingsDict: anObject [
 	settingsDict := anObject
+]
+
+{ #category : 'accessing' }
+SisSettings >> screenshotDir [
+	^ self at: #screenshotDir fallback: {'PHARO_SIS_DIR'. FileLocator temp fullName}
+]
+
+{ #category : 'accessing' }
+SisSettings >> screenshotDir: aString [
+	self at: #screenshotDir put: aString
+]
+
+{ #category : 'accessing' }
+SisSettings >> screenshotDirectory [
+	^ self screenshotDir asFileReference
 ]
 
 { #category : 'accessing' }
@@ -111,7 +143,7 @@ SisSettings >> teapotConfigKeys [
 
 { #category : 'accessing-keys' }
 SisSettings >> definedSettingsKeys [
-	^ #(#stackSize)
+	^ #(#screenshotDir #stackSize)
 ]
 
 { #category : 'private' }
