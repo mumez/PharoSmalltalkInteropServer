@@ -113,7 +113,7 @@ SisSettings >> settingsDict: anObject [
 
 { #category : 'accessing' }
 SisSettings >> screenshotDir [
-	^ self at: #screenshotDir fallback: {'PHARO_SIS_DIR'. FileLocator temp fullName}
+	^ self at: #screenshotDir fallback: {'PHARO_SIS_SCREENSHOT_DIR'. FileLocator temp fullName}
 ]
 
 { #category : 'accessing' }

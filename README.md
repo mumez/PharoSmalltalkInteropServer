@@ -72,7 +72,7 @@ Default values can be overridden via environment variables before starting the P
 | Variable | Description | Default |
 |---|---|---|
 | `PHARO_SIS_PORT` | Server port | `8086` |
-| `PHARO_SIS_DIR` | Screenshot save directory | system temp dir |
+| `PHARO_SIS_SCREENSHOT_DIR` | Screenshot save directory | system temp dir |
 
 ### Settings Management via API
 
