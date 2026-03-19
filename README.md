@@ -65,6 +65,15 @@ SisServer current settings at: #stackSize put: 200.
 SisServer current settings.
 ```
 
+### Environment Variables
+
+Default values can be overridden via environment variables before starting the Pharo image:
+
+| Variable | Description | Default |
+|---|---|---|
+| `PHARO_SIS_PORT` | Server port | `8086` |
+| `PHARO_SIS_DIR` | Screenshot save directory | system temp dir |
+
 ### Settings Management via API
 
 You can also manage settings through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
