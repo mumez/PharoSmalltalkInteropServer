@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'teapot',
 		'teapotConfig',
-		'settings'
+		'settings',
+		'announcer'
 	],
 	#classInstVars : [
 		'current'
@@ -72,6 +73,16 @@ SisServer class >> startUp: isImageStarting [
 		addDeferredStartupAction: [ self current ]
 ]
 
+{ #category : 'accessing' }
+SisServer >> announcer [
+	^ announcer ifNil: [ announcer := Announcer new ]
+]
+
+{ #category : 'private' }
+SisServer >> asCamelCase: aString [
+	^ (aString copyReplaceAll: '_' with: ' ') asCamelCase uncapitalized
+]
+
 { #category : 'private - ui extraction' }
 SisServer >> buildSummaryFor: targetType structure: structure [
 	"Generate human-readable summary"
@@ -92,6 +103,8 @@ SisServer >> buildSummaryFor: targetType structure: structure [
 SisServer >> createTeapot [
 
 	^ (Teapot configure: self teapotConfig associations)
+		  before: '/*' -> [:req | self onBeforeRequest: req ];
+		  after: '/*' -> [:req | self onAfterRequest: req ];
 		  POST: '/eval' -> [ :req | self handleEval: req ];
 		  POST: '/apply-settings' -> [ :req | self handleApplySettings: req ];
 		  GET: '/get-settings' -> [ :req | self handleGetSettings: req ];
@@ -516,11 +529,6 @@ SisServer >> handleGetClassComment: request [
 ]
 
 { #category : 'handling' }
-SisServer >> handleGetSettings: request [
-	^ self returnResultDo: [ self settings asDictionary ]
-]
-
-{ #category : 'handling' }
 SisServer >> handleGetClassSource: request [
 	^ self returnResultDo: [
 			  | className targetClass |
@@ -542,6 +550,11 @@ SisServer >> handleGetMethodSource: request [
 			  targetClass := Smalltalk globals at: className asSymbol.
 			  isClassSide ifTrue: [ targetClass := targetClass class ].
 			  targetClass sourceCodeAt: methodName asSymbol ]
+]
+
+{ #category : 'handling' }
+SisServer >> handleGetSettings: request [
+	^ self returnResultDo: [ self settings asDictionary ]
 ]
 
 { #category : 'handling' }
@@ -758,6 +771,16 @@ SisServer >> handleSearchTraitsLike: request [
 			  results ]
 ]
 
+{ #category : 'private - requesting' }
+SisServer >> onAfterRequest: aTeapotRequest [
+	self announcer announce: (SisRequestAnnouncement after: aTeapotRequest )
+]
+
+{ #category : 'private - requesting' }
+SisServer >> onBeforeRequest: aTeapotRequest [
+	self announcer announce: (SisRequestAnnouncement before: aTeapotRequest )
+]
+
 { #category : 'private' }
 SisServer >> receiverErrorInfoFrom: receiverObject [
 	| receiverErrorInfo values |
@@ -793,11 +816,6 @@ SisServer >> returnResultDo: aBlock [
 	^ resultDict
 ]
 
-{ #category : 'private' }
-SisServer >> asCamelCase: aString [
-	^ (aString copyReplaceAll: '_' with: ' ') asCamelCase uncapitalized
-]
-
 { #category : 'accessing' }
 SisServer >> settings [
 
@@ -830,6 +848,11 @@ SisServer >> stop [
 	self teapot stop
 ]
 
+{ #category : 'subscription' }
+SisServer >> subscribeOnRequest: aValuable for: aSubscriber [
+	self announcer when: SisRequestAnnouncement do: aValuable for: aSubscriber 
+]
+
 { #category : 'accessing' }
 SisServer >> teapot [
 
@@ -857,4 +880,9 @@ SisServer >> teapotConfig: anObject [
 { #category : 'private' }
 SisServer >> testResultStringFrom: aTestResult [
 	^ String streamContents: [ :aStream | aTestResult fileOutOn: aStream ].
+]
+
+{ #category : 'subscription' }
+SisServer >> unsubscribe: aSubscriber [
+	self announcer unsubscribe: aSubscriber
 ]
