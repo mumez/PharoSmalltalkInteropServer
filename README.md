@@ -93,6 +93,25 @@ curl -X POST http://localhost:8086/apply-settings \
   -d '{"settings": {"stack_size": 150, "custom_key": "value"}}'
 ```
 
+### Request Announcements
+
+SisServer fires `SisRequestAnnouncement` events before and after each request is processed, allowing external code to observe or react to API calls.
+
+```Smalltalk
+"Subscribe to all request events"
+SisServer current
+    subscribeOnRequest: [ :announcement |
+        Transcript crShow: ('{1} {2}' format: { announcement type. announcement teapotRequest url }) ]
+    for: Transcript.
+
+"Unsubscribe when done"
+SisServer current unsubscribe: Transcript.
+```
+
+Each `SisRequestAnnouncement` carries:
+- `type` — `#before` (fired before processing) or `#after` (fired after processing)
+- `teapotRequest` — the raw Teapot request object, including the URL and other request details
+
 ### Auto-restart Behavior
 After the first start, SisServer automatically restarts when the Pharo image starts up, ensuring continuous availability.
 
