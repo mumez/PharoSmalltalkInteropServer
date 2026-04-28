@@ -260,6 +260,31 @@ SisTest >> testRunPackageTest [
 	self assert: (result includesSubstring: '3 ran, 3 passed, ')
 ]
 
+{ #category : 'tests-subscription' }
+SisTest >> testRequestAnnouncementDeliveredToSubscriber [
+	| server announcements url resp requestAnnouncements |
+	server := SisServer current.
+	announcements := OrderedCollection new.
+
+	[
+		server
+			subscribeOnRequest: [ :announcement | announcements add: announcement ]
+			for: self.
+
+		url := self baseUrl / 'list-packages'.
+		resp := self get: url.
+		self assert: (resp at: #success).
+
+		requestAnnouncements := announcements select: [ :each |
+			(each teapotRequest url asString includesSubstring: '/list-packages') ].
+
+		self assert: requestAnnouncements size equals: 2.
+		self assert: requestAnnouncements first class equals: SisRequestAnnouncement.
+		self assert: requestAnnouncements first type equals: #before.
+		self assert: requestAnnouncements second type equals: #after
+	] ensure: [ server unsubscribe: self ]
+]
+
 { #category : 'tests' }
 SisTest >> testReadScreenDefault [
 	| url resp result structure summary |
