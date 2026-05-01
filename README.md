@@ -16,6 +16,14 @@ A powerful web API server that bridges Pharo Smalltalk environments with externa
 - **UI Debugging**: Capture screenshots and extract UI structure for World morphs, Spec presenters, and Roassal visualizations
 - **MCP Protocol**: Designed as a Model Context Protocol server core for AI integration
 
+## Use Cases
+
+- **AI Code Assistants**: Enable AI agents to understand and manipulate Smalltalk code
+- **IDE Integration**: Connect external editors with Smalltalk environments
+- **Code Analysis Tools**: Build tools that analyze Smalltalk codebases
+- **Remote Development**: Access Smalltalk environments from remote tools
+- **Educational Platforms**: Create interactive Smalltalk learning environments
+
 ## Installation
 
 ### Prerequisites
@@ -33,20 +41,50 @@ Metacello new
 
 ## Quick Start
 
-### Basic Server Operations
+The server **automatically starts** after installation (on default port 8086) and **auto-restarts** whenever the Pharo image starts up. You can immediately start using the API:
+
+```bash
+# Evaluate a Smalltalk expression
+curl -X POST http://localhost:8086/eval/ \
+  -H "Content-Type: application/json" \
+  -d '{"code": "42 factorial"}'
+
+# Search for classes
+curl "http://localhost:8086/search-classes-like?class_name_query=String"
+
+# Get class source code
+curl "http://localhost:8086/get-class-source?class_name=OrderedCollection"
+
+# Get method source code
+curl "http://localhost:8086/get-method-source?class_name=OrderedCollection&method_name=add:"
+```
+
+## API
+
+The server exposes a RESTful API for Smalltalk introspection and manipulation. All endpoints return standardized JSON responses.
+
+| Category | Endpoints |
+|---|---|
+| **Code Evaluation** | `POST /eval/` |
+| **Class Operations** | `GET /list-classes`, `/list-extended-classes`, `/get-class-source`, `/get-class-comment` |
+| **Method Operations** | `GET /list-methods`, `/get-method-source` |
+| **Search** | `GET /search-classes-like`, `/search-traits-like`, `/search-methods-like`, `/search-references`, `/search-implementors`, `/search-references-to-class` |
+| **Package Operations** | `GET /list-packages`, `/export-package`, `/import-package` |
+| **Test Execution** | `GET /run-package-test`, `/run-class-test` |
+| **Project** | `GET /install-project` |
+| **Settings** | `POST /apply-settings`, `GET /get-settings` |
+| **UI Debugging** | `GET /read-screen` |
+
+For detailed documentation with curl examples and response formats, see [API.md](API.md).
+
+## Server Management
+
+### Start / Stop / Restart
 
 ```Smalltalk
-"Start the server"
-SisServer current start.
-
-"Stop the server"
-SisServer current stop.
-
-"Check server status"
-SisServer current.
-
-"Restart for resetting the server"
-SisServer restart.
+SisServer current start.   "Start the server"
+SisServer current stop.    "Stop the server"
+SisServer restart.         "Restart (stop, reset, start)"
 ```
 
 ### Configuration
@@ -76,21 +114,16 @@ Default values can be overridden via environment variables before starting the P
 
 ### Settings Management via API
 
-You can also manage settings through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
+Settings can also be managed dynamically through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
 
 ```bash
 # Get current settings
 curl http://localhost:8086/get-settings
 
-# Apply new settings (using camelCase)
+# Apply new settings
 curl -X POST http://localhost:8086/apply-settings \
   -H "Content-Type: application/json" \
   -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
-
-# Apply new settings (using snake_case - automatically normalized to camelCase)
-curl -X POST http://localhost:8086/apply-settings \
-  -H "Content-Type: application/json" \
-  -d '{"settings": {"stack_size": 150, "custom_key": "value"}}'
 ```
 
 ### Request Announcements
@@ -111,19 +144,6 @@ SisServer current unsubscribe: Transcript.
 Each `SisRequestAnnouncement` carries:
 - `type` — `#before` (fired before processing) or `#after` (fired after processing)
 - `teapotRequest` — the raw Teapot request object, including the URL and other request details
-
-### Auto-restart Behavior
-After the first start, SisServer automatically restarts when the Pharo image starts up, ensuring continuous availability.
-
-## API
-
-The server exposes a RESTful API with comprehensive Smalltalk introspection and manipulation capabilities. All endpoints return standardized JSON responses with detailed error information including stack traces and receiver context when errors occur.
-
-**Response Format:**
-- **Success**: `{"success": true, "result": "..."}`
-- **Error**: `{"success": false, "error": {"description": "...", "stack_trace": "...", "receiver": {...}}}`
-
-For complete API documentation with detailed examples, see [API.md](API.md).
 
 ## Development
 
@@ -151,14 +171,6 @@ src/
 - **NeoJSON**: JSON serialization/deserialization
 - **Zinc HTTP Components**: HTTP client capabilities
 - **Tonel**: Package serialization format
-
-## Use Cases
-
-- **AI Code Assistants**: Enable AI agents to understand and manipulate Smalltalk code
-- **IDE Integration**: Connect external editors with Smalltalk environments
-- **Code Analysis Tools**: Build tools that analyze Smalltalk codebases
-- **Remote Development**: Access Smalltalk environments from remote tools
-- **Educational Platforms**: Create interactive Smalltalk learning environments
 
 ## Contributing
 
