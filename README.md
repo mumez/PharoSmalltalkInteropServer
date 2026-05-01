@@ -16,6 +16,14 @@ A powerful web API server that bridges Pharo Smalltalk environments with externa
 - **UI Debugging**: Capture screenshots and extract UI structure for World morphs, Spec presenters, and Roassal visualizations
 - **MCP Protocol**: Designed as a Model Context Protocol server core for AI integration
 
+## Use Cases
+
+- **AI Code Assistants**: Enable AI agents to understand and manipulate Smalltalk code
+- **IDE Integration**: Connect external editors with Smalltalk environments
+- **Code Analysis Tools**: Build tools that analyze Smalltalk codebases
+- **Remote Development**: Access Smalltalk environments from remote tools
+- **Educational Platforms**: Create interactive Smalltalk learning environments
+
 ## Installation
 
 ### Prerequisites
@@ -163,14 +171,6 @@ src/
 - **NeoJSON**: JSON serialization/deserialization
 - **Zinc HTTP Components**: HTTP client capabilities
 - **Tonel**: Package serialization format
-
-## Use Cases
-
-- **AI Code Assistants**: Enable AI agents to understand and manipulate Smalltalk code
-- **IDE Integration**: Connect external editors with Smalltalk environments
-- **Code Analysis Tools**: Build tools that analyze Smalltalk codebases
-- **Remote Development**: Access Smalltalk environments from remote tools
-- **Educational Platforms**: Create interactive Smalltalk learning environments
 
 ## Contributing
 
