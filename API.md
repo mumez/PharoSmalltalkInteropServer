@@ -282,27 +282,27 @@ Retrieves current server settings.
 ```bash
 curl -X POST http://localhost:8086/eval/ \
   -H "Content-Type: application/json" \
-  -d '{"code": "5 rem: 3"}'
+  -d '{"code": "42 factorial"}'
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "result": 2
+  "result": 1405006117752879898543142606244511569936384000000000
 }
 ```
 
-### Search Classes
+### Get Class Source
 ```bash
-curl "http://localhost:8086/search-classes-like?class_name_query=SisFixture"
+curl "http://localhost:8086/get-class-source?class_name=OrderedCollection"
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "result": ["SisFixtureClassForTest"]
+  "result": "Class {\n\t#name : 'OrderedCollection',\n\t..."
 }
 ```
 
@@ -320,14 +320,14 @@ Get the source code of a specific method from a class.
 
 **Example - Instance Method:**
 ```bash
-curl "http://localhost:8086/get-method-source?class_name=SisFixtureClassForTest&method_name=testMethodBbb"
+curl "http://localhost:8086/get-method-source?class_name=OrderedCollection&method_name=add:"
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "result": "testMethodBbb\n\t^ #TestSymbolBBB"
+  "result": "add: newObject\n\t..."
 }
 ```
 
@@ -351,6 +351,48 @@ curl "http://localhost:8086/get-method-source?class_name=Array%20class&method_na
 
 **Note:** The `is_class_method` parameter provides a cleaner alternative to appending ' class' to the class name. Both methods are supported for backward compatibility.
 
+### Search Classes
+```bash
+curl "http://localhost:8086/search-classes-like?class_name_query=SisFixture"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": ["SisFixtureClassForTest"]
+}
+```
+
+### List and Search Methods
+```bash
+# List methods in a class
+curl "http://localhost:8086/list-methods?class_name=SisServer"
+
+# Search method selectors by prefix
+curl "http://localhost:8086/search-methods-like?method_name_query=asJson"
+
+# Find implementors of a method
+curl "http://localhost:8086/search-implementors?method_name=printOn:"
+
+# Find references to a symbol
+curl "http://localhost:8086/search-references?method_name=start"
+```
+
+### Package Operations
+```bash
+# List all packages
+curl http://localhost:8086/list-packages
+
+# List classes in a package
+curl "http://localhost:8086/list-classes?package_name=Sis-Core"
+
+# Export a package (Tonel format)
+curl "http://localhost:8086/export-package?package_name=Sis-Core&path=/tmp/export"
+
+# Import a package
+curl "http://localhost:8086/import-package?path=/tmp/export/Sis-Core"
+```
 
 ### Run Package Tests
 ```bash
@@ -363,6 +405,11 @@ curl "http://localhost:8086/run-package-test?package_name=Sis-Tests-Dummy"
   "success": true,
   "result": "3 ran, 3 passed, 0 failed, 0 errors"
 }
+```
+
+### Run Class Tests
+```bash
+curl "http://localhost:8086/run-class-test?class_name=SisTest"
 ```
 
 ## Error Handling

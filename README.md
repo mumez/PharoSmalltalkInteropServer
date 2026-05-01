@@ -53,96 +53,21 @@ curl "http://localhost:8086/get-method-source?class_name=OrderedCollection&metho
 
 ## API
 
-The server exposes a RESTful API for Smalltalk introspection and manipulation. All endpoints return standardized JSON responses:
+The server exposes a RESTful API for Smalltalk introspection and manipulation. All endpoints return standardized JSON responses.
 
-- **Success**: `{"success": true, "result": "..."}`
-- **Error**: `{"success": false, "error": {"description": "...", "stack_trace": "...", "receiver": {...}}}`
+| Category | Endpoints |
+|---|---|
+| **Code Evaluation** | `POST /eval/` |
+| **Class Operations** | `GET /list-classes`, `/list-extended-classes`, `/get-class-source`, `/get-class-comment` |
+| **Method Operations** | `GET /list-methods`, `/get-method-source` |
+| **Search** | `GET /search-classes-like`, `/search-traits-like`, `/search-methods-like`, `/search-references`, `/search-implementors`, `/search-references-to-class` |
+| **Package Operations** | `GET /list-packages`, `/export-package`, `/import-package` |
+| **Test Execution** | `GET /run-package-test`, `/run-class-test` |
+| **Project** | `GET /install-project` |
+| **Settings** | `POST /apply-settings`, `GET /get-settings` |
+| **UI Debugging** | `GET /read-screen` |
 
-### Code Evaluation
-
-```bash
-curl -X POST http://localhost:8086/eval/ \
-  -H "Content-Type: application/json" \
-  -d '{"code": "3 + 4 * 5"}'
-# => {"success":true,"result":35}
-```
-
-### Code Introspection
-
-```bash
-# List classes in a package
-curl "http://localhost:8086/list-classes?package_name=Sis-Core"
-
-# Get class definition source
-curl "http://localhost:8086/get-class-source?class_name=SisServer"
-
-# Get class comment
-curl "http://localhost:8086/get-class-comment?class_name=SisServer"
-
-# List methods in a class
-curl "http://localhost:8086/list-methods?class_name=SisServer"
-
-# Get instance method source
-curl "http://localhost:8086/get-method-source?class_name=SisServer&method_name=start"
-
-# Get class-side method source
-curl "http://localhost:8086/get-method-source?class_name=Array&method_name=with:&is_class_method=true"
-```
-
-### Search
-
-```bash
-# Search classes by prefix
-curl "http://localhost:8086/search-classes-like?class_name_query=Sis"
-
-# Search method selectors
-curl "http://localhost:8086/search-methods-like?method_name_query=asJson"
-
-# Find implementors of a method
-curl "http://localhost:8086/search-implementors?method_name=printOn:"
-
-# Find references to a symbol
-curl "http://localhost:8086/search-references?method_name=start"
-```
-
-### Package Operations
-
-```bash
-# List all packages
-curl http://localhost:8086/list-packages
-
-# Export a package (Tonel format)
-curl "http://localhost:8086/export-package?package_name=Sis-Core&path=/tmp/export"
-
-# Import a package
-curl "http://localhost:8086/import-package?path=/tmp/export/Sis-Core"
-```
-
-### Test Execution
-
-```bash
-# Run all tests in a package
-curl "http://localhost:8086/run-package-test?package_name=Sis-Tests"
-
-# Run tests for a specific class
-curl "http://localhost:8086/run-class-test?class_name=SisTest"
-```
-
-### Settings Management
-
-The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
-
-```bash
-# Get current settings
-curl http://localhost:8086/get-settings
-
-# Apply new settings
-curl -X POST http://localhost:8086/apply-settings \
-  -H "Content-Type: application/json" \
-  -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
-```
-
-For complete API specification, see [API.md](API.md).
+For detailed documentation with curl examples and response formats, see [API.md](API.md).
 
 ## Server Management
 
