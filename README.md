@@ -33,20 +33,55 @@ Metacello new
 
 ## Quick Start
 
-### Basic Server Operations
+The server **automatically starts** after installation (on default port 8086) and **auto-restarts** whenever the Pharo image starts up. You can immediately start using the API:
+
+```bash
+# Evaluate a Smalltalk expression
+curl -X POST http://localhost:8086/eval/ \
+  -H "Content-Type: application/json" \
+  -d '{"code": "42 factorial"}'
+
+# Search for classes
+curl "http://localhost:8086/search-classes-like?class_name_query=String"
+
+# Get method source code
+curl "http://localhost:8086/get-method-source?class_name=SisServer&method_name=start"
+
+# Run tests
+curl "http://localhost:8086/run-package-test?package_name=Sis-Tests"
+```
+
+### Settings Management via API
+
+Settings can be managed through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
+
+```bash
+# Get current settings
+curl http://localhost:8086/get-settings
+
+# Apply new settings
+curl -X POST http://localhost:8086/apply-settings \
+  -H "Content-Type: application/json" \
+  -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
+```
+
+### Environment Variables
+
+Default values can be overridden via environment variables before starting the Pharo image:
+
+| Variable | Description | Default |
+|---|---|---|
+| `PHARO_SIS_PORT` | Server port | `8086` |
+| `PHARO_SIS_SCREENSHOT_DIR` | Screenshot save directory | system temp dir |
+
+## Server Management
+
+### Start / Stop / Restart
 
 ```Smalltalk
-"Start the server"
-SisServer current start.
-
-"Stop the server"
-SisServer current stop.
-
-"Check server status"
-SisServer current.
-
-"Restart for resetting the server"
-SisServer restart.
+SisServer current start.   "Start the server"
+SisServer current stop.    "Stop the server"
+SisServer restart.         "Restart (stop, reset, start)"
 ```
 
 ### Configuration
@@ -63,34 +98,6 @@ SisServer current settings at: #stackSize put: 200.
 
 "View current settings"
 SisServer current settings.
-```
-
-### Environment Variables
-
-Default values can be overridden via environment variables before starting the Pharo image:
-
-| Variable | Description | Default |
-|---|---|---|
-| `PHARO_SIS_PORT` | Server port | `8086` |
-| `PHARO_SIS_SCREENSHOT_DIR` | Screenshot save directory | system temp dir |
-
-### Settings Management via API
-
-You can also manage settings through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
-
-```bash
-# Get current settings
-curl http://localhost:8086/get-settings
-
-# Apply new settings (using camelCase)
-curl -X POST http://localhost:8086/apply-settings \
-  -H "Content-Type: application/json" \
-  -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
-
-# Apply new settings (using snake_case - automatically normalized to camelCase)
-curl -X POST http://localhost:8086/apply-settings \
-  -H "Content-Type: application/json" \
-  -d '{"settings": {"stack_size": 150, "custom_key": "value"}}'
 ```
 
 ### Request Announcements
@@ -111,9 +118,6 @@ SisServer current unsubscribe: Transcript.
 Each `SisRequestAnnouncement` carries:
 - `type` — `#before` (fired before processing) or `#after` (fired after processing)
 - `teapotRequest` — the raw Teapot request object, including the URL and other request details
-
-### Auto-restart Behavior
-After the first start, SisServer automatically restarts when the Pharo image starts up, ensuring continuous availability.
 
 ## API
 
