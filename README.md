@@ -104,6 +104,20 @@ Default values can be overridden via environment variables before starting the P
 | `PHARO_SIS_PORT` | Server port | `8086` |
 | `PHARO_SIS_SCREENSHOT_DIR` | Screenshot save directory | system temp dir |
 
+### Settings Management via API
+
+Settings can also be managed dynamically through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
+
+```bash
+# Get current settings
+curl http://localhost:8086/get-settings
+
+# Apply new settings
+curl -X POST http://localhost:8086/apply-settings \
+  -H "Content-Type: application/json" \
+  -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
+```
+
 ### Request Announcements
 
 SisServer fires `SisRequestAnnouncement` events before and after each request is processed, allowing external code to observe or react to API calls.
