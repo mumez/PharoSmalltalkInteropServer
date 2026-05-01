@@ -30,6 +30,7 @@ A powerful web API server that bridges Pharo Smalltalk environments with externa
 - Pharo Smalltalk image (tested with Pharo 12+)
 
 ### Install via Metacello
+
 Execute in Pharo Playground:
 
 ```Smalltalk
@@ -37,6 +38,14 @@ Metacello new
   baseline: 'PharoSmalltalkInteropServer';
   repository: 'github://mumez/PharoSmalltalkInteropServer:main/src';
   load.
+```
+
+Or install from the command line without launching the UI:
+
+```bash
+./pharo Pharo.image metacello install \
+  github://mumez/PharoSmalltalkInteropServer:main/src \
+  BaselineOfPharoSmalltalkInteropServer
 ```
 
 ## Quick Start
