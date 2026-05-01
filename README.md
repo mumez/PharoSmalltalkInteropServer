@@ -44,16 +44,93 @@ curl -X POST http://localhost:8086/eval/ \
 # Search for classes
 curl "http://localhost:8086/search-classes-like?class_name_query=String"
 
-# Get method source code
-curl "http://localhost:8086/get-method-source?class_name=SisServer&method_name=start"
+# Get class source code
+curl "http://localhost:8086/get-class-source?class_name=OrderedCollection"
 
-# Run tests
-curl "http://localhost:8086/run-package-test?package_name=Sis-Tests"
+# Get method source code
+curl "http://localhost:8086/get-method-source?class_name=OrderedCollection&method_name=add:"
 ```
 
-### Settings Management via API
+## API
 
-Settings can be managed through HTTP endpoints. The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
+The server exposes a RESTful API for Smalltalk introspection and manipulation. All endpoints return standardized JSON responses:
+
+- **Success**: `{"success": true, "result": "..."}`
+- **Error**: `{"success": false, "error": {"description": "...", "stack_trace": "...", "receiver": {...}}}`
+
+### Code Evaluation
+
+```bash
+curl -X POST http://localhost:8086/eval/ \
+  -H "Content-Type: application/json" \
+  -d '{"code": "3 + 4 * 5"}'
+# => {"success":true,"result":35}
+```
+
+### Code Introspection
+
+```bash
+# List classes in a package
+curl "http://localhost:8086/list-classes?package_name=Sis-Core"
+
+# Get class definition source
+curl "http://localhost:8086/get-class-source?class_name=SisServer"
+
+# Get class comment
+curl "http://localhost:8086/get-class-comment?class_name=SisServer"
+
+# List methods in a class
+curl "http://localhost:8086/list-methods?class_name=SisServer"
+
+# Get instance method source
+curl "http://localhost:8086/get-method-source?class_name=SisServer&method_name=start"
+
+# Get class-side method source
+curl "http://localhost:8086/get-method-source?class_name=Array&method_name=with:&is_class_method=true"
+```
+
+### Search
+
+```bash
+# Search classes by prefix
+curl "http://localhost:8086/search-classes-like?class_name_query=Sis"
+
+# Search method selectors
+curl "http://localhost:8086/search-methods-like?method_name_query=asJson"
+
+# Find implementors of a method
+curl "http://localhost:8086/search-implementors?method_name=printOn:"
+
+# Find references to a symbol
+curl "http://localhost:8086/search-references?method_name=start"
+```
+
+### Package Operations
+
+```bash
+# List all packages
+curl http://localhost:8086/list-packages
+
+# Export a package (Tonel format)
+curl "http://localhost:8086/export-package?package_name=Sis-Core&path=/tmp/export"
+
+# Import a package
+curl "http://localhost:8086/import-package?path=/tmp/export/Sis-Core"
+```
+
+### Test Execution
+
+```bash
+# Run all tests in a package
+curl "http://localhost:8086/run-package-test?package_name=Sis-Tests"
+
+# Run tests for a specific class
+curl "http://localhost:8086/run-class-test?class_name=SisTest"
+```
+
+### Settings Management
+
+The API accepts both camelCase and snake_case keys (e.g., `stackSize` or `stack_size`), which are automatically normalized to camelCase:
 
 ```bash
 # Get current settings
@@ -65,14 +142,7 @@ curl -X POST http://localhost:8086/apply-settings \
   -d '{"settings": {"stackSize": 150, "customKey": "value"}}'
 ```
 
-### Environment Variables
-
-Default values can be overridden via environment variables before starting the Pharo image:
-
-| Variable | Description | Default |
-|---|---|---|
-| `PHARO_SIS_PORT` | Server port | `8086` |
-| `PHARO_SIS_SCREENSHOT_DIR` | Screenshot save directory | system temp dir |
+For complete API specification, see [API.md](API.md).
 
 ## Server Management
 
@@ -100,6 +170,15 @@ SisServer current settings at: #stackSize put: 200.
 SisServer current settings.
 ```
 
+### Environment Variables
+
+Default values can be overridden via environment variables before starting the Pharo image:
+
+| Variable | Description | Default |
+|---|---|---|
+| `PHARO_SIS_PORT` | Server port | `8086` |
+| `PHARO_SIS_SCREENSHOT_DIR` | Screenshot save directory | system temp dir |
+
 ### Request Announcements
 
 SisServer fires `SisRequestAnnouncement` events before and after each request is processed, allowing external code to observe or react to API calls.
@@ -118,16 +197,6 @@ SisServer current unsubscribe: Transcript.
 Each `SisRequestAnnouncement` carries:
 - `type` — `#before` (fired before processing) or `#after` (fired after processing)
 - `teapotRequest` — the raw Teapot request object, including the URL and other request details
-
-## API
-
-The server exposes a RESTful API with comprehensive Smalltalk introspection and manipulation capabilities. All endpoints return standardized JSON responses with detailed error information including stack traces and receiver context when errors occur.
-
-**Response Format:**
-- **Success**: `{"success": true, "result": "..."}`
-- **Error**: `{"success": false, "error": {"description": "...", "stack_trace": "...", "receiver": {...}}}`
-
-For complete API documentation with detailed examples, see [API.md](API.md).
 
 ## Development
 
