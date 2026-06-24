@@ -35,7 +35,7 @@ BaselineOfPharoSmalltalkInteropServer >> teapot: spec [
 	spec
 		baseline: 'Teapot' with: [
 				spec
-					repository: 'github://zeroflag/Teapot:master/source';
+					repository: 'github://ba-st-dependencies/Teapot:v4';
 					loads: #( 'Deployment' ) ];
 		import: 'Teapot'
 ]
