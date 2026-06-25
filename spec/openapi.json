@@ -478,6 +478,20 @@
                             "type": "string"
                         },
                         "description": "Comma-separated list of groups to load"
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "true",
+                                "false"
+                            ],
+                            "default": "false"
+                        },
+                        "description": "Force load ignoring conflicts, upgrades, and image changes"
                     }
                 ],
                 "responses": {
