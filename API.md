@@ -276,6 +276,27 @@ Retrieves current server settings.
 }
 ```
 
+### Install Project (`GET /install-project`)
+
+Installs a baseline project using Metacello.
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `project_name` | string | required | Name of the baseline project |
+| `repository_url` | string | required | Repository URL (e.g. `tonel:///path/to/repo` or `github://...`) |
+| `load_groups` | string | '' | Comma-separated list of load groups / package groups |
+| `force` | boolean | false | If `true`, ignores conflicts/upgrades/image changes and forces load (`onConflict: [ :e \| e useIncoming ]`, `onUpgrade: [ :e \| e useIncoming ]`, `ignoreImage` are set) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "result": "Installed: MetacelloProjectRegistration(PharoSmalltalkInteropServer)"
+}
+```
+
 ## Usage Examples
 
 ### Evaluate Smalltalk Code

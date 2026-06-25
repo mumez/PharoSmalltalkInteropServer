@@ -193,6 +193,21 @@ SisTest >> testInstallProject [
 ]
 
 { #category : 'tests' }
+SisTest >> testInstallProjectWithForce [
+	| url resp result errorDesc |
+	url := self baseUrl / 'install-project'.
+	url queryAt: 'project_name' put: 'PharoSmalltalkInteropServer'.
+	url queryAt: 'repository_url' put: 'github://mumez/PharoSmalltalkInteropServer:main/src'.
+	url queryAt: 'load_groups' put: 'NonExistentGroupA, NonExistentGroupB'.
+	url queryAt: 'force' put: 'true'.
+	resp := self get: url.
+	self deny: (resp at: #success).
+	result := resp at: #error.
+	errorDesc := result at: #description.
+	self assert: ((errorDesc beginsWith: 'Error: Name not found') or: [errorDesc beginsWith: 'MetacelloConflictingProjectError:']). "for CI"
+]
+
+{ #category : 'tests' }
 SisTest >> testListClasses [
 	| url resp result |
 	url := self baseUrl / 'list-classes'.
