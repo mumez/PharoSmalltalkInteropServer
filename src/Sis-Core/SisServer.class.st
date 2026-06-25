@@ -576,7 +576,7 @@ SisServer >> handleImportPackage: request [
 SisServer >> handleInstallProject: request [
 
 	^ self returnResultDo: [
-			  | projectName repositoryUrl loadGroups loadOptions forceParam force builder registration |
+			  | projectName repositoryUrl loadGroups loadOptions forceParam force metacello registration |
 			  projectName := request at: #project_name.
 			  repositoryUrl := request at: #repository_url.
 			  loadGroups := request at: #load_groups ifAbsent: [ '' ].
@@ -584,15 +584,15 @@ SisServer >> handleInstallProject: request [
 			  forceParam := request at: #force ifAbsent: [ 'false' ].
 			  force := forceParam asString asLowercase = 'true'.
 			  [
-				  builder := Metacello new
+				  metacello := Metacello new
 					  baseline: projectName;
 					  repository: repositoryUrl.
 				  force ifTrue: [
-					  builder
+					  metacello
 						  onConflict: [ :e | e useIncoming ];
 						  onUpgrade: [ :e | e useIncoming ];
 						  ignoreImage ].
-				  registration := builder load: loadOptions.
+				  registration := metacello load: loadOptions.
 				  'Installed: ' , registration printString
 			  ] on: MCMergeOrLoadWarning do: [ :ex | Error signal: ex description ] ]
 ]
@@ -859,7 +859,7 @@ SisServer >> stop [
 
 { #category : 'subscription' }
 SisServer >> subscribeOnRequest: aValuable for: aSubscriber [
-	self announcer when: SisRequestAnnouncement do: aValuable for: aSubscriber 
+	self announcer when: SisRequestAnnouncement do: aValuable for: aSubscriber
 ]
 
 { #category : 'accessing' }
