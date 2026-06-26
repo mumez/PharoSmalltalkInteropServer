@@ -103,6 +103,7 @@ SisServer >> buildSummaryFor: targetType structure: structure [
 SisServer >> createTeapot [
 
 	^ (Teapot configure: self teapotConfig associations)
+		  exception: NeoJSONMappingNotFound -> [:ex :req | self onJsonMappingNotFound: req for: ex ];
 		  before: '/*' -> [:req | self onBeforeRequest: req ];
 		  after: '/*' -> [:req | self onAfterRequest: req ];
 		  POST: '/eval' -> [ :req | self handleEval: req ];
@@ -788,6 +789,21 @@ SisServer >> onAfterRequest: aTeapotRequest [
 { #category : 'private - requesting' }
 SisServer >> onBeforeRequest: aTeapotRequest [
 	self announcer announce: (SisRequestAnnouncement before: aTeapotRequest )
+]
+
+{ #category : 'handling-error' }
+SisServer >> onJsonMappingNotFound: aTeapotRequest for: aNeoJSONMappingNotFound [
+	| errorInfo unmappedClass resultDict isEval |
+	unmappedClass := aNeoJSONMappingNotFound object.
+	errorInfo := {'description' -> ('JSON mapping not found for: {1}' format: {unmappedClass})} asDictionary.
+	resultDict := {'error' -> errorInfo. 'success' -> false} asDictionary.
+	isEval := aTeapotRequest url asString = '/eval'.
+	isEval ifTrue: [
+        resultDict at: 'success' put: true.
+        errorInfo at: 'description' put: ('Result is a {1} instance which cannot be serialized as JSON' format: {unmappedClass}).
+        errorInfo at: 'suggestion' put: ('Modify the expression to return a serializable value. For a human-readable result, append `printString` (e.g., `(<your expression>) printString`)')
+	].
+	^ TeaResponse ok body: resultDict
 ]
 
 { #category : 'private' }
