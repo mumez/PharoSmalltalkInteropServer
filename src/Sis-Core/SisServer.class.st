@@ -807,7 +807,7 @@ SisServer >> onJsonMappingNotFound: aTeapotRequest for: aNeoJSONMappingNotFound 
 
 { #category : 'private' }
 SisServer >> objectReferenceFrom: unmappedObject [
-    ^ '{1}-{2}' format: {DateAndTime current asNanoSeconds. unmappedObject identityHash }
+    ^ 'oref#{1}-{2}' format: {DateAndTime current asNanoSeconds. unmappedObject identityHash }
 ]
 
 { #category : 'private' }
