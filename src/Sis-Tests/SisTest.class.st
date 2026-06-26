@@ -63,8 +63,9 @@ SisTest >> testEvalWithUnserializableResult [
 	self assert: (resp at: #success).
 	errorInfo := resp at: #error.
 	description := errorInfo at: #description.
-	self assert: (description includesSubstring: 'Returning object-reference:').
-	self assert: (description includesSubstring: '(object cannot be serialized as JSON)')
+	self assert: (description includesSubstring: 'Result is a').
+	self assert: (description includesSubstring: 'cannot be serialized as JSON').
+	self assert: (errorInfo includesKey: #suggestion)
 ]
 
 { #category : 'tests' }

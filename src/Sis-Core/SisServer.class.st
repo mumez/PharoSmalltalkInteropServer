@@ -800,15 +800,10 @@ SisServer >> onJsonMappingNotFound: aTeapotRequest for: aNeoJSONMappingNotFound 
 	isEval := aTeapotRequest url asString = '/eval'.
 	isEval ifTrue: [
         resultDict at: 'success' put: true.
-        errorInfo at: 'description' put: ('{1} instance cannot be serialized as JSON' format: {unmappedClass}).
-        errorInfo at: 'suggestion' put: ('Add `printString` to your eval return expression')
+        errorInfo at: 'description' put: ('Result is a {1} instance which cannot be serialized as JSON' format: {unmappedClass}).
+        errorInfo at: 'suggestion' put: ('Modify the expression to return a serializable value. For a human-readable result, append `printString` (e.g., `(<your expression>) printString`)')
 	].
 	^ TeaResponse ok body: resultDict
-]
-
-{ #category : 'private' }
-SisServer >> objectReferenceFrom: unmappedObject [
-    ^ 'oref#{1}-{2}' format: {DateAndTime current asNanoSeconds. unmappedObject identityHash }
 ]
 
 { #category : 'private' }
