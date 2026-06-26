@@ -1,6 +1,6 @@
 # PharoSmalltalkInteropServer
 
-[![CI](https://github.com/mumez/PharoSmalltalkInteropServer/actions/workflows/main.yml/badge.svg)](https://github.com/mumez/PharoSmalltalkInteropServer/actions/workflows/main.yml)
+[![CI](https://github.com/Mercap/PharoSmalltalkInteropServer/actions/workflows/main.yml/badge.svg)](https://github.com/Mercap/PharoSmalltalkInteropServer/actions/workflows/main.yml)
 
 A powerful web API server that bridges Pharo Smalltalk environments with external tools, enabling seamless integration with AI agents, editors, and other development tools. The server provides comprehensive introspection and manipulation capabilities for Smalltalk code.
 
@@ -36,7 +36,7 @@ Execute in Pharo Playground:
 ```Smalltalk
 Metacello new
   baseline: 'PharoSmalltalkInteropServer';
-  repository: 'github://mumez/PharoSmalltalkInteropServer:main/src';
+  repository: 'github://Mercap/PharoSmalltalkInteropServer:release-candidate/src';
   load.
 ```
 
@@ -44,7 +44,7 @@ Or install from the command line without launching the UI:
 
 ```bash
 ./pharo Pharo.image metacello install \
-  github://mumez/PharoSmalltalkInteropServer:main/src \
+  github://Mercap/PharoSmalltalkInteropServer:release-candidate/src \
   BaselineOfPharoSmalltalkInteropServer
 ```
 

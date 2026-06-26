@@ -63,7 +63,7 @@ SisServer current settings   "View current settings"
 ```smalltalk
 Metacello new
   baseline: 'PharoSmalltalkInteropServer';
-  repository: 'github://mumez/PharoSmalltalkInteropServer:main/src';
+  repository: 'github://Mercap/PharoSmalltalkInteropServer:release-candidate/src';
   load.
 ```
 
