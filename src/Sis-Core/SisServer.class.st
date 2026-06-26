@@ -800,7 +800,7 @@ SisServer >> onJsonMappingNotFound: aTeapotRequest for: aNeoJSONMappingNotFound 
 	isEval := aTeapotRequest url asString = '/eval'.
 	isEval ifTrue: [
         resultDict at: 'success' put: true.
-        errorInfo at: 'description' put: ('Return object-ref is: {1}. Object itself cannot be deserialized as JSON' format: {self objectReferenceFrom: unmappedObject})
+        errorInfo at: 'description' put: ('Returning object-reference: {1} (object cannot be serialized as JSON)' format: {self objectReferenceFrom: unmappedObject})
 	].
 	^ TeaResponse ok body: resultDict
 ]
