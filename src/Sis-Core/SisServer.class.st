@@ -103,6 +103,7 @@ SisServer >> buildSummaryFor: targetType structure: structure [
 SisServer >> createTeapot [
 
 	^ (Teapot configure: self teapotConfig associations)
+		  exception: NeoJSONMappingNotFound -> [:ex :req | self onJsonMappingNotFound: req for: ex ];
 		  before: '/*' -> [:req | self onBeforeRequest: req ];
 		  after: '/*' -> [:req | self onAfterRequest: req ];
 		  POST: '/eval' -> [ :req | self handleEval: req ];
@@ -788,6 +789,25 @@ SisServer >> onAfterRequest: aTeapotRequest [
 { #category : 'private - requesting' }
 SisServer >> onBeforeRequest: aTeapotRequest [
 	self announcer announce: (SisRequestAnnouncement before: aTeapotRequest )
+]
+
+{ #category : 'handling-error' }
+SisServer >> onJsonMappingNotFound: aTeapotRequest for: aNeoJSONMappingNotFound [
+	| errorInfo unmappedObject resultDict isEval |
+	unmappedObject := aNeoJSONMappingNotFound object.
+	errorInfo := {'description' -> ('JSON mapping not found for: {1}' format: {unmappedObject})} asDictionary.
+	resultDict := {'error' -> errorInfo. 'success' -> false} asDictionary.
+	isEval := aTeapotRequest url asString = '/eval'.
+	isEval ifTrue: [
+        resultDict at: 'success' put: true.
+        errorInfo at: 'description' put: ('Return object-ref is: {1}. Object itself cannot be deserialized as JSON' format: {self objectReferenceFrom: unmappedObject})
+	].
+	^ TeaResponse ok body: resultDict
+]
+
+{ #category : 'private' }
+SisServer >> objectReferenceFrom: unmappedObject [
+    ^ '{1}-{2}' format: {DateAndTime current asNanoSeconds. unmappedObject identityHash }
 ]
 
 { #category : 'private' }
