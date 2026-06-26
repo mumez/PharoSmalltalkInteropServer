@@ -793,14 +793,15 @@ SisServer >> onBeforeRequest: aTeapotRequest [
 
 { #category : 'handling-error' }
 SisServer >> onJsonMappingNotFound: aTeapotRequest for: aNeoJSONMappingNotFound [
-	| errorInfo unmappedObject resultDict isEval |
-	unmappedObject := aNeoJSONMappingNotFound object.
-	errorInfo := {'description' -> ('JSON mapping not found for: {1}' format: {unmappedObject})} asDictionary.
+	| errorInfo unmappedClass resultDict isEval |
+	unmappedClass := aNeoJSONMappingNotFound object.
+	errorInfo := {'description' -> ('JSON mapping not found for: {1}' format: {unmappedClass})} asDictionary.
 	resultDict := {'error' -> errorInfo. 'success' -> false} asDictionary.
 	isEval := aTeapotRequest url asString = '/eval'.
 	isEval ifTrue: [
         resultDict at: 'success' put: true.
-        errorInfo at: 'description' put: ('Returning object-reference: {1} (object cannot be serialized as JSON)' format: {self objectReferenceFrom: unmappedObject})
+        errorInfo at: 'description' put: ('{1} instance cannot be serialized as JSON' format: {unmappedClass}).
+        errorInfo at: 'suggestion' put: ('Add `printString` to your eval return expression')
 	].
 	^ TeaResponse ok body: resultDict
 ]
