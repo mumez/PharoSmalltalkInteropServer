@@ -91,21 +91,21 @@ SisTest >> testExportImportPackage [
 	tempDir := FileSystem workingDirectory / 'temp_export'.
 	tempDir ensureCreateDirectory.
 	url := self baseUrl / 'export-package'.
-	url queryAt: 'package_name' put: 'Sis-Tests-Dummy'.
+	url queryAt: 'package_name' put: 'SIS-DummyTests'.
 	url queryAt: 'path' put: tempDir absolutePath pathString.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result beginsWith: 'Sis-Tests-Dummy exported to: ').
-	
+	self assert: (result beginsWith: 'SIS-DummyTests exported to: ').
+
 	url := self baseUrl / 'import-package'.
-	url queryAt: 'package_name' put: 'Sis-Tests-Dummy'.
+	url queryAt: 'package_name' put: 'SIS-DummyTests'.
 	url queryAt: 'path' put: tempDir absolutePath pathString.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result beginsWith: 'Sis-Tests-Dummy imported from: ').
-	
+	self assert: (result beginsWith: 'SIS-DummyTests imported from: ').
+
 	tempDir deleteAll
 ]
 
@@ -203,7 +203,7 @@ SisTest >> testInstallProject [
 	result := resp at: #error.
 	errorDesc := result at: #description.
 	self assert: ((errorDesc beginsWith: 'Error: Name not found') or: [errorDesc beginsWith: 'MetacelloConflictingProjectError:']). "for CI"
-	
+
 ]
 
 { #category : 'tests' }
@@ -282,7 +282,7 @@ SisTest >> testRunClassTest [
 SisTest >> testRunPackageTest [
 	| url resp result |
 	url := self baseUrl / 'run-package-test'.
-	url queryAt: 'package_name' put: 'Sis-Tests-Dummy'.
+	url queryAt: 'package_name' put: 'SIS-DummyTests'.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
