@@ -417,7 +417,7 @@ curl "http://localhost:8086/import-package?path=/tmp/export/Sis-Core"
 
 ### Run Package Tests
 ```bash
-curl "http://localhost:8086/run-package-test?package_name=SIS-DummyTests"
+curl "http://localhost:8086/run-package-test?package_name=Sis-DummyTests"
 ```
 
 **Response:**

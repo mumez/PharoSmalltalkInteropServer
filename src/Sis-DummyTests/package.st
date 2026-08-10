@@ -1,1 +1,1 @@
-Package { #name : 'SIS-DummyTests' }
+Package { #name : 'Sis-DummyTests' }

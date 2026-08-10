@@ -1,8 +1,8 @@
 Class {
 	#name : 'SisDummyTest',
 	#superclass : 'TestCase',
-	#category : 'SIS-DummyTests',
-	#package : 'SIS-DummyTests'
+	#category : 'Sis-DummyTests',
+	#package : 'Sis-DummyTests'
 }
 
 { #category : 'tests' }

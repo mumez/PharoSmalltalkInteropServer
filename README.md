@@ -171,7 +171,7 @@ src/
 ├── BaselineOfPharoSmalltalkInteropServer/  # Metacello baseline configuration
 ├── Sis-Core/                               # Core server implementation
 ├── Sis-Tests/                              # Main test suite
-└── SIS-DummyTests/                        # Test fixtures
+└── Sis-DummyTests/                        # Test fixtures
 ```
 
 ## Dependencies

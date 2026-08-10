@@ -91,20 +91,20 @@ SisTest >> testExportImportPackage [
 	tempDir := FileSystem workingDirectory / 'temp_export'.
 	tempDir ensureCreateDirectory.
 	url := self baseUrl / 'export-package'.
-	url queryAt: 'package_name' put: 'SIS-DummyTests'.
+	url queryAt: 'package_name' put: 'Sis-DummyTests'.
 	url queryAt: 'path' put: tempDir absolutePath pathString.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result beginsWith: 'SIS-DummyTests exported to: ').
+	self assert: (result beginsWith: 'Sis-DummyTests exported to: ').
 
 	url := self baseUrl / 'import-package'.
-	url queryAt: 'package_name' put: 'SIS-DummyTests'.
+	url queryAt: 'package_name' put: 'Sis-DummyTests'.
 	url queryAt: 'path' put: tempDir absolutePath pathString.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.
-	self assert: (result beginsWith: 'SIS-DummyTests imported from: ').
+	self assert: (result beginsWith: 'Sis-DummyTests imported from: ').
 
 	tempDir deleteAll
 ]
@@ -282,7 +282,7 @@ SisTest >> testRunClassTest [
 SisTest >> testRunPackageTest [
 	| url resp result |
 	url := self baseUrl / 'run-package-test'.
-	url queryAt: 'package_name' put: 'SIS-DummyTests'.
+	url queryAt: 'package_name' put: 'Sis-DummyTests'.
 	resp := self get: url.
 	self assert: (resp at: #success).
 	result := resp at: #result.

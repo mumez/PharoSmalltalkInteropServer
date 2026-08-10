@@ -29,7 +29,7 @@ curl -s http://localhost:8086/get-settings
 Tests run against the live server via the HTTP API:
 ```bash
 curl -s "http://localhost:8086/run-package-test?package_name=Sis-Tests"
-curl -s "http://localhost:8086/run-package-test?package_name=SIS-DummyTests"
+curl -s "http://localhost:8086/run-package-test?package_name=Sis-DummyTests"
 ```
 
 Alternatively, run tests from the CLI without a running server (uses smalltalkCI conventions):

@@ -15,12 +15,12 @@ BaselineOfPharoSmalltalkInteropServer >> baseline: spec [
 			spec package: 'Sis-Core' with: [ spec requires: #( 'Teapot' ) ].
 			spec
 				package: 'Sis-Tests'
-				with: [ spec requires: #( 'Sis-Core' 'SIS-DummyTests' ) ].
-			spec package: 'SIS-DummyTests'.
+				with: [ spec requires: #( 'Sis-Core' 'Sis-DummyTests' ) ].
+			spec package: 'Sis-DummyTests'.
 			spec
 				group: 'default' with: #( 'Core' 'Tests' );
 				group: 'Core' with: #( 'Sis-Core' );
-				group: 'Tests' with: #( 'Sis-Tests' 'SIS-DummyTests' ) ]
+				group: 'Tests' with: #( 'Sis-Tests' 'Sis-DummyTests' ) ]
 ]
 
 { #category : 'baselines' }
