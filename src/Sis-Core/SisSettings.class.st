@@ -93,7 +93,7 @@ SisSettings >> initFrom: otherSettings [
 
 { #category : 'accessing' }
 SisSettings >> port [
-	^ self at: #port fallback: {'PHARO_SIS_PORT'. 8086} type: Integer
+	^ self at: #port fallback: {'SIS_PORT'. 8086} type: Integer
 ]
 
 { #category : 'accessing' }
@@ -113,7 +113,7 @@ SisSettings >> settingsDict: anObject [
 
 { #category : 'accessing' }
 SisSettings >> screenshotDir [
-	^ self at: #screenshotDir fallback: {'PHARO_SIS_SCREENSHOT_DIR'. FileLocator temp fullName}
+	^ self at: #screenshotDir fallback: {'SIS_SCREENSHOT_DIR'. FileLocator temp fullName}
 ]
 
 { #category : 'accessing' }

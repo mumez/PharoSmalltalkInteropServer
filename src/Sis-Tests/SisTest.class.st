@@ -17,7 +17,7 @@ SisTest >> testSettingsFallbackEnvVarFound [
 SisTest >> testSettingsFallbackEnvVarAbsent [
 	| settings result |
 	settings := SisSettings new.
-	result := settings at: #testPort fallback: {'PHARO_SIS_NONEXISTENT_XYZ'. 9999} type: Integer.
+	result := settings at: #testPort fallback: {'SIS_NONEXISTENT_XYZ'. 9999} type: Integer.
 	self assert: result equals: 9999
 ]
 
