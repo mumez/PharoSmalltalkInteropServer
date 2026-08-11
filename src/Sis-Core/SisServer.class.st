@@ -58,7 +58,7 @@ SisServer class >> restart [
 	<script>
 	self current stop.
 	self current: nil.
-	self current start.
+	self current.
 ]
 
 { #category : 'system startup' }
@@ -893,7 +893,7 @@ SisServer >> teapot: anObject [
 { #category : 'accessing' }
 SisServer >> teapotConfig [
 
-	^ teapotConfig ifNil: [ teapotConfig := self class defaultTeapotConfig ]
+	^ teapotConfig
 ]
 
 { #category : 'accessing' }

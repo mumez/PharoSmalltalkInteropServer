@@ -20,7 +20,7 @@ PharoSmalltalkInteropServer is a Smalltalk-based web API server that provides in
 
 - **Sis-Core**: Core server implementation
 - **Sis-Tests**: Main test suite with comprehensive API testing
-- **Sis-Tests-Dummy**: Dummy test fixtures for testing export/import functionality
+- **Sis-DummyTests**: Dummy test fixtures for testing export/import functionality
 
 ### API Endpoints
 

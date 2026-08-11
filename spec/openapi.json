@@ -909,6 +909,10 @@
                         "type": "string",
                         "description": "Brief error type or message"
                     },
+                    "suggestion": {
+                        "type": "string",
+                        "description": "Suggested action to resolve the issue (e.g., how to modify the eval expression to return a serializable value)"
+                    },
                     "stack_trace": {
                         "type": "string",
                         "description": "Complete stack trace showing the call chain that led to the error"
