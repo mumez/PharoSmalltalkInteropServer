@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Pharo Smalltalk Interop Server API",
-        "version": "3.2.0",
+        "version": "3.4.0",
         "description": "RESTful API for Smalltalk code introspection, manipulation, UI debugging, and settings management"
     },
     "servers": [
