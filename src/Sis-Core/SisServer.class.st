@@ -820,7 +820,7 @@ SisServer >> receiverErrorInfoFrom: receiverObject [
 
 { #category : 'private' }
 SisServer >> returnError: anError by: resultDict [
-    | errorInfo signalerContext |
+	| errorInfo signalerContext |
 	errorInfo := Dictionary new.
 	errorInfo at: 'description' put: anError description.
 	signalerContext := anError signalerContext.
