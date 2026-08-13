@@ -820,11 +820,15 @@ SisServer >> receiverErrorInfoFrom: receiverObject [
 
 { #category : 'private' }
 SisServer >> returnError: anError by: resultDict [
-	| errorInfo signalerContext |
+    | errorInfo signalerContext |
 	errorInfo := Dictionary new.
 	errorInfo at: 'description' put: anError description.
 	signalerContext := anError signalerContext.
-	errorInfo at: 'stack_trace' put: (String streamContents: [:strm | signalerContext debugStack: self stackSize on: strm]).
+	errorInfo
+		at: 'stack_trace'
+		put: (String
+				streamContents: [:strm | (signalerContext stackOfSize: self stackSize)
+						do: [:item | strm print: item; cr]]).
 	errorInfo at: 'receiver' put: (self receiverErrorInfoFrom: signalerContext receiver).
 	resultDict at: 'error' put: errorInfo.
 	^ resultDict
