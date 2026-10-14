@@ -491,7 +491,7 @@
                             ],
                             "default": "false"
                         },
-                        "description": "Force load ignoring conflicts, upgrades, and image changes"
+                        "description": "Force load ignoring conflicts, upgrades, and image changes; also loads through MCMergeOrLoadWarning instead of returning an error"
                     }
                 ],
                 "responses": {
