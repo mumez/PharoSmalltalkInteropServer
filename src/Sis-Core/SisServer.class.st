@@ -595,7 +595,7 @@ SisServer >> handleInstallProject: request [
 						  ignoreImage ].
 				  registration := metacello load: loadOptions.
 				  'Installed: ' , registration printString
-			  ] on: MCMergeOrLoadWarning do: [ :ex | Error signal: ex description ] ]
+			  ] on: MCMergeOrLoadWarning do: [ :ex | force ifTrue: [ex load] ifFalse: [Error signal: ex description] ] ]
 ]
 
 { #category : 'handling' }

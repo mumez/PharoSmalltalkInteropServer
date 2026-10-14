@@ -43,6 +43,89 @@ SisTest >> post: anUrl dictionary:  dict [
 	^ NeoJSONReader fromString:  resp  contents
 ]
 
+{ #category : 'private' }
+SisTest >> createTemporaryForceTestProject [
+	"Create a tiny Metacello project outside Sis baselines for install-project force tests."
+	| tempDir |
+	tempDir := FileSystem workingDirectory / 'temp_sis_force_test'.
+	tempDir ensureDeleteAll.
+	tempDir ensureCreateDirectory.
+	self writeTemporaryForceTestBaselineTo: tempDir.
+	self writeTemporaryForceTestCoreTo: tempDir.
+	^ tempDir
+]
+
+{ #category : 'private' }
+SisTest >> installTemporaryForceTestProjectAt: tempDir force: forceBoolean [
+	| url |
+	url := self baseUrl / 'install-project'.
+	url queryAt: 'project_name' put: 'SisForceTest'.
+	url queryAt: 'repository_url' put: 'tonel://' , tempDir absolutePath pathString.
+	forceBoolean ifTrue: [ url queryAt: 'force' put: 'true' ].
+	^ self get: url
+]
+
+{ #category : 'private' }
+SisTest >> removeTemporaryForceTestProject: tempDir [
+	(self packageOrganizer packageNamed: 'SisForceTest-Core' ifAbsent: [ nil ])
+		ifNotNil: [ :pkg | pkg removeFromSystem ].
+	(self packageOrganizer packageNamed: 'BaselineOfSisForceTest' ifAbsent: [ nil ])
+		ifNotNil: [ :pkg | pkg removeFromSystem ].
+	(MetacelloProjectRegistration
+		registrationForClassNamed: 'BaselineOfSisForceTest'
+		ifAbsent: [ nil ]) ifNotNil: [ :reg | reg unregisterProject ].
+	tempDir exists ifTrue: [ tempDir deleteAll ]
+]
+
+{ #category : 'private' }
+SisTest >> writeTemporaryForceTestBaselineTo: tempDir [
+	| dir |
+	dir := (tempDir / 'BaselineOfSisForceTest') ensureCreateDirectory.
+	(dir / 'package.st') writeStreamEncoded: 'utf8' do: [ :s |
+			s nextPutAll: 'Package {
+	#name : ''BaselineOfSisForceTest''
+}
+' ].
+	(dir / 'BaselineOfSisForceTest.class.st') writeStreamEncoded: 'utf8' do: [ :s |
+			s nextPutAll: 'Class {
+	#name : ''BaselineOfSisForceTest'',
+	#superclass : ''BaselineOf'',
+	#category : ''BaselineOfSisForceTest'',
+	#package : ''BaselineOfSisForceTest''
+}
+
+{ #category : ''baselines'' }
+BaselineOfSisForceTest >> baseline: spec [
+	<baseline>
+	spec for: #common do: [ spec package: ''SisForceTest-Core'' ]
+]
+' ]
+]
+
+{ #category : 'private' }
+SisTest >> writeTemporaryForceTestCoreTo: tempDir [
+	| dir |
+	dir := (tempDir / 'SisForceTest-Core') ensureCreateDirectory.
+	(dir / 'package.st') writeStreamEncoded: 'utf8' do: [ :s |
+			s nextPutAll: 'Package {
+	#name : ''SisForceTest-Core''
+}
+' ].
+	(dir / 'SisForceTestDummy.class.st') writeStreamEncoded: 'utf8' do: [ :s |
+			s nextPutAll: 'Class {
+	#name : ''SisForceTestDummy'',
+	#superclass : ''Object'',
+	#category : ''SisForceTest-Core'',
+	#package : ''SisForceTest-Core''
+}
+
+{ #category : ''accessing'' }
+SisForceTestDummy >> value [
+	^ 42
+]
+' ]
+]
+
 { #category : 'tests' }
 SisTest >> testEval [
 	| url postData resp result |
@@ -208,17 +291,19 @@ SisTest >> testInstallProject [
 
 { #category : 'tests' }
 SisTest >> testInstallProjectWithForce [
-	| url resp result errorDesc |
-	url := self baseUrl / 'install-project'.
-	url queryAt: 'project_name' put: 'PharoSmalltalkInteropServer'.
-	url queryAt: 'repository_url' put: 'github://mumez/PharoSmalltalkInteropServer:main/src'.
-	url queryAt: 'load_groups' put: 'NonExistentGroupA, NonExistentGroupB'.
-	url queryAt: 'force' put: 'true'.
-	resp := self get: url.
-	self deny: (resp at: #success).
-	result := resp at: #error.
-	errorDesc := result at: #description.
-	self assert: ((errorDesc beginsWith: 'Error: Name not found') or: [errorDesc beginsWith: 'MetacelloConflictingProjectError:']). "for CI"
+	"Isolated temp project (outside Sis baselines): dirty package raises MCMergeOrLoadWarning,
+	and force=true loads through it instead of returning an error."
+	| tempDir resp workingCopy |
+	tempDir := self createTemporaryForceTestProject.
+	[
+		resp := self installTemporaryForceTestProjectAt: tempDir force: false.
+		self assert: (resp at: #success).
+		workingCopy := (MCPackage named: 'SisForceTest-Core') workingCopy.
+		workingCopy modified: true.
+		resp := self installTemporaryForceTestProjectAt: tempDir force: true.
+		self assert: (resp at: #success).
+		self assert: ((resp at: #result) beginsWith: 'Installed:')
+	] ensure: [ self removeTemporaryForceTestProject: tempDir ]
 ]
 
 { #category : 'tests' }
