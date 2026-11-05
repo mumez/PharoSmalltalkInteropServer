@@ -5,11 +5,11 @@ Class {
 		'teapot',
 		'teapotConfig',
 		'settings',
-		'announcer'
+		'announcer',
+		'resumeAfterSnapshot'
 	],
 	#classInstVars : [
-		'current',
-		'resumeAfterSnapshot'
+		'current'
 	],
 	#category : 'Sis-Core',
 	#package : 'Sis-Core'
@@ -68,9 +68,7 @@ SisServer class >> shutDown: isImageQuitting [
 	process is saved into the image. Such a stale process would wake up on the
 	next image start and race with the new server ('Address already in use')."
 
-	current ifNil: [ ^ self ].
-	resumeAfterSnapshot := current isRunning.
-	current stop
+	current ifNotNil: [ :server | server stopForSnapshot ]
 ]
 
 { #category : 'system startup' }
@@ -78,7 +76,7 @@ SisServer class >> startUp: isImageStarting [
 
 	isImageStarting ifFalse: [
 		"Image was only saved: resume the server stopped in #shutDown:"
-		(current notNil and: [ resumeAfterSnapshot == true ]) ifTrue: [ current start ].
+		current ifNotNil: [ :server | server resumeFromSnapshot ].
 		^ self ].
 
 	current ifNotNil: [ current stop ].
@@ -885,6 +883,17 @@ SisServer >> stackSize [
 { #category : 'testing' }
 SisServer >> isRunning [
 	^ self teapot server isRunning
+]
+
+{ #category : 'actions' }
+SisServer >> resumeFromSnapshot [
+	resumeAfterSnapshot == true ifTrue: [ self start ]
+]
+
+{ #category : 'actions' }
+SisServer >> stopForSnapshot [
+	resumeAfterSnapshot := self isRunning.
+	self stop
 ]
 
 { #category : 'actions' }
