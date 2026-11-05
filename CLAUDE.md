@@ -13,7 +13,7 @@ PharoSmalltalkInteropServer is a Smalltalk-based web API server that provides in
 - **SisServer** (`src/Sis-Core/SisServer.class.st`): Main server class using Teapot web framework
   - Singleton pattern via `SisServer current`
   - RESTful API endpoints for Smalltalk operations
-  - Auto-restart on image startup via `startUp:` class method
+  - Stops before image snapshots via `shutDown:` so no server process is saved; restarts on image startup (and resumes after a save without quit) via `startUp:`
   - Default port: 8086 (configurable via `SisServer teapotConfig at: #port put: <port>`)
 
 ### Package Structure

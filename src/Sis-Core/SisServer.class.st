@@ -8,7 +8,8 @@ Class {
 		'announcer'
 	],
 	#classInstVars : [
-		'current'
+		'current',
+		'resumeAfterSnapshot'
 	],
 	#category : 'Sis-Core',
 	#package : 'Sis-Core'
@@ -62,9 +63,23 @@ SisServer class >> restart [
 ]
 
 { #category : 'system startup' }
+SisServer class >> shutDown: isImageQuitting [
+	"Stop the current server before the snapshot so that no listening or worker
+	process is saved into the image. Such a stale process would wake up on the
+	next image start and race with the new server ('Address already in use')."
+
+	current ifNil: [ ^ self ].
+	resumeAfterSnapshot := current isRunning.
+	current stop
+]
+
+{ #category : 'system startup' }
 SisServer class >> startUp: isImageStarting [
 
-	isImageStarting ifFalse: [ ^ self ].
+	isImageStarting ifFalse: [
+		"Image was only saved: resume the server stopped in #shutDown:"
+		(current notNil and: [ resumeAfterSnapshot == true ]) ifTrue: [ current start ].
+		^ self ].
 
 	current ifNotNil: [ current stop ].
 	current := nil.
@@ -865,6 +880,11 @@ SisServer >> settingsAt: key [
 { #category : 'accessing - settings' }
 SisServer >> stackSize [
 	^ self settings stackSize
+]
+
+{ #category : 'testing' }
+SisServer >> isRunning [
+	^ self teapot server isRunning
 ]
 
 { #category : 'actions' }

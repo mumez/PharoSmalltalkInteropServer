@@ -22,6 +22,40 @@ SisTest >> testSettingsFallbackEnvVarAbsent [
 ]
 
 { #category : 'private' }
+SisTest >> withTemporaryCurrentServerDo: aBlock [
+	"Swap in a separate server, so that the server handling this test run stays untouched."
+	| saved server config |
+	saved := SisServer current.
+	config := SisServer defaultSettingsCopied teapotConfig copy.
+	config at: #port put: 58086.
+	server := SisServer configure: config.
+	SisServer current: server.
+	[ aBlock value: server ] ensure: [
+		server stop.
+		SisServer current: saved ]
+]
+
+{ #category : 'tests-lifecycle' }
+SisTest >> testShutDownStopsRunningServerAndSaveResumesIt [
+	self withTemporaryCurrentServerDo: [ :server |
+		server start.
+		self assert: server isRunning.
+		SisServer shutDown: false.
+		self deny: server isRunning.
+		SisServer startUp: false.
+		self assert: server isRunning ]
+]
+
+{ #category : 'tests-lifecycle' }
+SisTest >> testSaveDoesNotResumeExplicitlyStoppedServer [
+	self withTemporaryCurrentServerDo: [ :server |
+		self deny: server isRunning.
+		SisServer shutDown: false.
+		SisServer startUp: false.
+		self deny: server isRunning ]
+]
+
+{ #category : 'private' }
 SisTest >> baseUrl [
 	| port |
 	port := SisServer current teapotConfig at: #port ifAbsent: [8086].
