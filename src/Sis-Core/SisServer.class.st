@@ -781,6 +781,12 @@ SisServer >> handleSearchTraitsLike: request [
 			  results ]
 ]
 
+{ #category : 'testing' }
+SisServer >> isRunning [
+	"Refer to teapot directly: printing must not create it as a side effect"
+	^ teapot notNil and: [ teapot server isRunning ]
+]
+
 { #category : 'private - requesting' }
 SisServer >> onAfterRequest: aTeapotRequest [
 	self announcer announce: (SisRequestAnnouncement after: aTeapotRequest )
@@ -804,6 +810,15 @@ SisServer >> onJsonMappingNotFound: aTeapotRequest for: aNeoJSONMappingNotFound 
         errorInfo at: 'suggestion' put: ('Modify the expression to return a serializable value. For a human-readable result, append `printString` (e.g., `(<your expression>) printString`)')
 	].
 	^ TeaResponse ok body: resultDict
+]
+
+{ #category : 'printing' }
+SisServer >> printOn: aStream [
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		nextPutAll: self statusString;
+		nextPut: $)
 ]
 
 { #category : 'private' }
@@ -870,6 +885,13 @@ SisServer >> stackSize [
 { #category : 'actions' }
 SisServer >> start [
 	self teapot start
+]
+
+{ #category : 'printing' }
+SisServer >> statusString [
+	^ 'isRunning={1}, settings={2}' format: {
+			  self isRunning printString.
+			  self settings settingsDict associations printString }
 ]
 
 { #category : 'actions' }

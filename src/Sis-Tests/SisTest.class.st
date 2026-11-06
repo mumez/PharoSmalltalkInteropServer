@@ -21,6 +21,40 @@ SisTest >> testSettingsFallbackEnvVarAbsent [
 	self assert: result equals: 9999
 ]
 
+{ #category : 'tests-printing' }
+SisTest >> testIsRunningWithoutTeapot [
+	self deny: SisServer new isRunning
+]
+
+{ #category : 'tests-printing' }
+SisTest >> testStatusStringWhenNotRunning [
+	| server |
+	server := SisServer new.
+	server settings: (SisSettings new
+			 at: #port put: 8086;
+			 yourself).
+	self
+		assert: server statusString
+		equals: 'isRunning=false, settings={#port->8086}'
+]
+
+{ #category : 'tests-printing' }
+SisTest >> testStatusStringWhenRunning [
+	self assert: (SisServer current statusString beginsWith: 'isRunning=true, settings={')
+]
+
+{ #category : 'tests-printing' }
+SisTest >> testPrintOn [
+	| server |
+	server := SisServer new.
+	server settings: (SisSettings new
+			 at: #port put: 8086;
+			 yourself).
+	self
+		assert: server printString
+		equals: 'a SisServer(isRunning=false, settings={#port->8086})'
+]
+
 { #category : 'private' }
 SisTest >> baseUrl [
 	| port |
