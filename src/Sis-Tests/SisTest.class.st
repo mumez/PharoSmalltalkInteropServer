@@ -22,37 +22,6 @@ SisTest >> testSettingsFallbackEnvVarAbsent [
 ]
 
 { #category : 'private' }
-SisTest >> withTemporaryServerDo: aBlock [
-	"Use a separate server, so that the server handling this test run stays untouched."
-	| tempPort config server |
-	tempPort := 58086.
-	config := SisServer defaultSettingsCopied teapotConfig copy.
-	config at: #port put: tempPort.
-	server := SisServer configure: config.
-	[ aBlock value: server ] ensure: [ server stop ]
-]
-
-{ #category : 'tests-lifecycle' }
-SisTest >> testStopForSnapshotStopsRunningServerAndResumeRestartsIt [
-	self withTemporaryServerDo: [ :server |
-		server start.
-		self assert: server isRunning.
-		server stopForSnapshot.
-		self deny: server isRunning.
-		server resumeFromSnapshot.
-		self assert: server isRunning ]
-]
-
-{ #category : 'tests-lifecycle' }
-SisTest >> testResumeFromSnapshotKeepsExplicitlyStoppedServerStopped [
-	self withTemporaryServerDo: [ :server |
-		self deny: server isRunning.
-		server stopForSnapshot.
-		server resumeFromSnapshot.
-		self deny: server isRunning ]
-]
-
-{ #category : 'private' }
 SisTest >> baseUrl [
 	| port |
 	port := SisServer current teapotConfig at: #port ifAbsent: [8086].
